@@ -1,0 +1,2332 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#4a9e2f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="利用者チェック表">
+<title>利用者チェック表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./app-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./app-icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #f2f8f0;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  -webkit-tap-highlight-color: transparent;
+}
+.topbar {
+  background: linear-gradient(135deg, #4a9e2f 0%, #65b842 55%, #84cc50 100%);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex: 0 0 auto;
+}
+.app-name { font-size: 16px; font-weight: 700; color: white; letter-spacing: 0.03em; }
+.month-nav { display: flex; align-items: center; gap: 6px; }
+.mbtn {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+}
+.mlabel { font-size: 14px; font-weight: 700; color: white; min-width: 88px; text-align: center; }
+.stats {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex: 1;
+  margin: 0 10px;
+  flex-wrap: wrap;
+}
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 7px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.18);
+}
+.stat-num { font-size: 13px; font-weight: 700; color: white; }
+.stat-num.g { color: #6ee7b7; }
+.stat-num.r { color: #fca5a5; }
+.stat-num.y { color: #fcd34d; }
+.stat-label { font-size: 10px; color: rgba(255,255,255,0.78); }
+.top-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.top-add-btn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.55);
+  background: #d4f0c4;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.top-add-btn.alt {
+  background: rgba(255,255,255,0.18);
+  color: white;
+}
+.top-add-btn.alt.is-placing {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+  box-shadow: 0 0 0 2px rgba(254, 243, 199, 0.28);
+}
+.top-toggle-btn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.18);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.tbl-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: white;
+}
+table { border-collapse: collapse; table-layout: fixed; min-width: 1120px; width: 100%; }
+thead th {
+  background: #f2fded;
+  border-bottom: 2px solid #b3e89a;
+  border-right: 0.5px solid #b3e89a;
+  vertical-align: bottom;
+  text-align: center;
+  padding: 4px 2px 8px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+th.h-no { width: 30px; font-size: 10px; color: #2d7a1a; font-weight: 700; }
+th.h-name { width: 92px; font-size: 10px; color: #2d7a1a; font-weight: 700; text-align: left; padding-left: 8px; }
+th.h-kosin { width: 64px; font-size: 10px; color: #2d7a1a; font-weight: 700; text-align: center; border-right: 2px solid #86d46a; }
+th.h-rot { width: 34px; }
+th.h-rot-date { width: 72px; }
+th.h-visit { width: 40px; }
+th.h-seho { width: 46px; }
+th.h-biko { font-size: 10px; color: #2d7a1a; font-weight: 700; text-align: left; padding-left: 8px; border-left: 2px solid #86d46a; min-width: 92px; }
+th .inner {
+  writing-mode: vertical-lr;
+  font-size: 10px;
+  font-weight: 700;
+  color: #2d7a1a;
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+  padding: 2px 0;
+}
+tbody tr:nth-child(even) { background: #f8fcff; }
+tbody tr:nth-child(odd) { background: white; }
+tbody tr.done-row { background: #f0fdf4 !important; }
+tbody tr.selected-row { background: #d4f0c4 !important; }
+tbody tr.done-row.selected-row { background: #dcfce7 !important; }
+tbody tr.blank-insert-target {
+  background: #fff7d6 !important;
+  box-shadow: inset 0 3px 0 #f59e0b;
+}
+td {
+  border-bottom: 1px solid #d4f0c4;
+  border-right: 0.5px solid #d4f0c4;
+  height: 46px;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 12px;
+  color: #92400e;
+}
+td.td-no { font-size: 11px; color: #86d46a; font-weight: 700; width: 30px; }
+td.td-no.is-holdable { cursor: grab; user-select: none; touch-action: none; }
+td.td-no.is-holdable:active { cursor: grabbing; }
+tr.row-dragging {
+  opacity: 0.88;
+  position: relative;
+  z-index: 3;
+  box-shadow: 0 8px 20px rgba(58,158,32,0.22);
+  transform: scale(1.01);
+}
+tr.row-drop-target {
+  outline: 2px solid #65b842;
+  outline-offset: -2px;
+  background: #eefce6 !important;
+}
+body.drag-sorting { user-select: none; }
+td.td-name {
+  text-align: left;
+  padding: 0 6px;
+  color: #1a4d0e;
+  width: 92px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.name-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-height: 40px;
+  overflow: hidden;
+}
+.name-kana {
+  font-size: 9px;
+  line-height: 1.1;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.name-main {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #1a4d0e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+td.td-kosin {
+  width: 64px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #92400e;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+  border-right: 2px solid #b3e89a;
+}
+td.td-date { font-size: 11px; font-weight: 600; color: #1a4d0e; padding: 0 3px; width: 72px; white-space: nowrap; }
+td.td-date.expiring { color: #dc2626; font-weight: 700; }
+td.td-date.expiring-done { color: #b8c0b3; font-weight: 600; }
+td.td-date.plan-long-current { color: #dc2626; font-weight: 700; }
+td.td-date.plan-current { color: #dc2626; font-weight: 700; }
+td.td-lv { font-size: 13px; font-weight: 700; color: #2d7a1a; width: 36px; }
+td.td-lv.is-clickable { cursor: pointer; }
+td.td-visit {
+  width: 68px;
+  outline: none;
+  padding: 3px 3px 4px;
+  cursor: pointer;
+}
+td.td-visit.is-empty { color: #cbd5e1; }
+td.td-visit.is-selected {
+  background: #dcfce7;
+  box-shadow: inset 0 0 0 2px #65b842;
+}
+.visit-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px;
+  min-height: 40px;
+  height: 100%;
+}
+.visit-cell.date-only {
+  justify-content: center;
+  gap: 0;
+}
+.visit-date-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #3a9e20;
+  line-height: 1.1;
+  min-height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.visit-cell.date-only .visit-date-text {
+  font-size: 13px;
+  line-height: 1.2;
+  min-height: 0;
+}
+.visit-tags {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 18px;
+  width: 100%;
+}
+.visit-cell.date-only .visit-tags {
+  display: none;
+}
+.visit-tag {
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 999px;
+  background: #e2f7d8;
+  color: #2d7a1a;
+}
+td.td-cc { cursor: pointer; width: 34px; user-select: none; }
+td.td-seho { width: 46px; cursor: pointer; padding: 2px 2px; }
+td.td-biko {
+  text-align: left;
+  padding: 0 8px;
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  border-left: 2px solid #b3e89a;
+  min-width: 92px;
+}
+.chip-warn {
+  display: inline-block;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 20px;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 700;
+  margin-left: 3px;
+  vertical-align: middle;
+}
+.circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.12s;
+  box-sizing: border-box;
+}
+.circle.on { background: #3a9e20; color: white; box-shadow: 0 2px 8px rgba(58,158,32,0.35); transform: scale(0.82); }
+.circle.pending { background: #d4f0c4; color: transparent; border: 1.5px solid #65b842; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.7); }
+.circle.off { background: transparent; color: transparent; border: 1.6px solid #65b842; box-shadow: none; transform: scale(0.82); }
+.seho-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #65b842;
+}
+.seho-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 40px;
+}
+.seho-label {
+  font-size: 8px;
+  line-height: 1.1;
+  color: #64748b;
+  white-space: nowrap;
+}
+.fac-header td {
+  background: #d4f0c4;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a4d0e;
+  padding: 4px 10px;
+  border-bottom: 1px solid #86d46a;
+  text-align: left;
+}
+.fac-add-btn {
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  border: 1.5px solid #86d46a;
+  background: white;
+  font-size: 11px;
+  font-weight: 700;
+  color: #2d7a1a;
+  cursor: pointer;
+  font-family: inherit;
+}
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(45,122,26,0.4);
+  z-index: 100;
+  justify-content: center;
+  align-items: flex-end;
+}
+.modal-bg.show { display: flex; }
+.modal-bg.add-client { align-items: center; padding: 16px; }
+.modal-bg.add-client .modal { border-radius: 16px; max-height: calc(100vh - 32px); }
+.modal-bg.compact-picker { align-items: center; padding: 16px; }
+.modal-bg.compact-picker .modal {
+  border-radius: 16px;
+  max-width: 260px;
+  max-height: none;
+  padding: 16px;
+}
+.modal-bg.compact-picker .modal-pill { margin-bottom: 10px; }
+.modal-bg.compact-picker .modal-name { font-size: 15px; margin-bottom: 10px; }
+.modal-bg.compact-picker .macts { justify-content: center; gap: 5px; }
+.modal-bg.compact-picker .mact {
+  flex: none;
+  min-width: 44px;
+  padding: 8px 8px;
+  font-size: 12px;
+}
+.modal-bg.compact-picker .modal-close {
+  margin-top: 8px;
+  padding: 10px;
+  font-size: 12px;
+}
+.modal-bg.calendar-picker { align-items: center; padding: 8px 12px; }
+.modal-bg.calendar-picker .modal {
+  border-radius: 16px;
+  max-width: 348px;
+  width: 100%;
+  max-height: none;
+  padding: 8px 12px;
+}
+.modal-bg.calendar-picker .macts {
+  display: block;
+  width: 100%;
+}
+.modal-bg.calendar-picker .modal-pill { margin-bottom: 6px; }
+.modal-bg.calendar-picker .modal-name { font-size: 14px; margin-bottom: 6px; }
+.calendar-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px;
+}
+.calendar-nav {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid #b3e89a;
+  background: #f2fded;
+  color: #2d7a1a;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.calendar-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a4d0e;
+}
+.calendar-selects {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+}
+.calendar-select {
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid #b3e89a;
+  background: white;
+  color: #1a4d0e;
+  font-size: 10px;
+  font-family: inherit;
+  padding: 0 5px;
+}
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.calendar-weekdays span {
+  text-align: center;
+  font-size: 9px;
+  color: #94a3b8;
+  line-height: 1;
+}
+.calendar-day {
+  aspect-ratio: 1 / 1;
+  min-height: 24px;
+  border-radius: 7px;
+  border: 1px solid #d4f0c4;
+  background: white;
+  color: #1a4d0e;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.calendar-day.blank {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+.calendar-day.sel {
+  background: #3a9e20;
+  border-color: #3a9e20;
+  color: white;
+}
+.visit-subactions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+.visit-subactions .mact {
+  flex: none;
+  min-width: 84px;
+  padding: 6px 9px;
+  font-size: 11px;
+}
+.visit-modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.visit-modal-actions .mact {
+  flex: 1;
+  min-width: 0;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.visit-free-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 5px;
+}
+.visit-free-inputs .modal-input {
+  margin-bottom: 0;
+  font-size: 12px;
+  padding: 8px 10px;
+}
+.visit-calendar-box {
+  gap: 1px;
+}
+.visit-calendar-box .visit-subactions {
+  margin-top: 2px;
+}
+.visit-calendar-box .visit-subactions .mact {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+.visit-calendar-box .visit-free-inputs {
+  gap: 3px;
+  margin-top: 3px;
+}
+.visit-calendar-box .visit-free-inputs .modal-input {
+  font-size: 11px;
+  padding: 5px 8px;
+}
+.visit-calendar-box .visit-modal-actions {
+  margin-top: 3px;
+  gap: 6px;
+}
+.visit-calendar-box .visit-modal-actions .mact {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.visit-cancel-btn {
+  width: 100%;
+  margin-top: 3px;
+  padding: 7px;
+}
+.modal-bg.visit-calendar-open > .modal > .modal-close:not(.visit-cancel-btn) {
+  display: none;
+}
+@media (max-width: 820px) {
+  .modal-bg.calendar-picker { padding: 6px 8px; }
+  .modal-bg.calendar-picker .modal {
+    max-width: 332px;
+    padding: 7px 9px;
+  }
+  .modal-bg.calendar-picker .modal-pill { margin-bottom: 5px; }
+  .modal-bg.calendar-picker .modal-name { font-size: 13px; margin-bottom: 5px; }
+  .calendar-nav {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+  .calendar-select {
+    height: 24px;
+    font-size: 9px;
+    padding: 0 4px;
+  }
+  .calendar-weekdays span {
+    font-size: 8px;
+  }
+  .calendar-day {
+    min-height: 21px;
+    font-size: 9px;
+    border-radius: 6px;
+  }
+  .visit-subactions {
+    margin-top: 3px;
+  }
+  .visit-subactions .mact,
+  .visit-modal-actions .mact {
+    font-size: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .visit-free-inputs {
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .visit-free-inputs .modal-input {
+    font-size: 11px;
+    padding: 7px 8px;
+  }
+  .visit-calendar-box .visit-subactions .mact {
+    font-size: 9px;
+    padding: 3px 7px;
+  }
+  .visit-calendar-box .visit-free-inputs .modal-input {
+    font-size: 10px;
+    padding: 4px 7px;
+  }
+  .visit-calendar-box .visit-modal-actions .mact {
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  .visit-cancel-btn {
+    margin-top: 2px;
+    padding: 6px;
+  }
+}
+.modal {
+  background: white;
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 -8px 40px rgba(58,158,32,0.18);
+  max-height: 40vh;
+  overflow-y: auto;
+}
+.modal-pill {
+  width: 36px;
+  height: 4px;
+  background: #b3e89a;
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal-col { font-size: 11px; color: #2d7a1a; font-weight: 700; margin-bottom: 3px; }
+.modal-name { font-size: 17px; font-weight: 700; color: #1a4d0e; margin-bottom: 14px; }
+.macts { display: flex; gap: 6px; flex-wrap: wrap; }
+.mact {
+  padding: 11px 10px;
+  border-radius: 10px;
+  border: 1.5px solid #b3e89a;
+  background: #f2fded;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d7a1a;
+  cursor: pointer;
+  flex: 1;
+  min-width: 55px;
+  text-align: center;
+  font-family: inherit;
+}
+.mact.green { background: #d1fae5; border-color: #6ee7b7; color: #065f46; }
+.mact.red { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+.mact.sel { background: #3a9e20; border-color: #3a9e20; color: white; }
+.modal-close {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1.5px solid #b3e89a;
+  background: white;
+  font-size: 13px;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: inherit;
+}
+textarea.modal-textarea,
+input.modal-input {
+  width: 100%;
+  font-size: 13px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1.5px solid #b3e89a;
+  background: #f2fded;
+  color: #1a4d0e;
+  font-family: inherit;
+  outline: none;
+}
+textarea.modal-textarea { height: 84px; resize: none; }
+input.modal-input { margin-bottom: 8px; }
+.confirm-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(45,122,26,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.confirm-bg.show { display: flex; }
+.confirm-box {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+.confirm-title { font-size: 16px; font-weight: 700; color: #1a4d0e; margin-bottom: 8px; }
+.confirm-msg { font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.6; }
+.confirm-btns { display: flex; gap: 8px; }
+.confirm-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.confirm-btn.ok { background: #3a9e20; color: white; }
+.confirm-btn.cancel { background: #f1f5f9; color: #64748b; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="app-name">利用者チェック表</div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-label">総数</div></div>
+    <div class="stat"><div class="stat-num r" id="s-notvisited">0</div><div class="stat-label">未訪問</div></div>
+    <button class="top-add-btn" onclick="openAddClient()">利用者追加</button>
+    <button class="top-add-btn alt" onclick="exportLocalData()">書出</button>
+    <button class="top-add-btn alt" onclick="triggerImportLocalData()">読込</button>
+    <button class="top-toggle-btn" id="date-toggle-btn" onclick="toggleAllDateMode()">西暦表示</button>
+    <button class="top-toggle-btn" id="order-toggle-btn" onclick="toggleOrderMode()">名前順</button>
+    <button class="top-add-btn alt" onclick="addBlankClientRow()">空欄追加</button>
+  </div>
+  <div class="month-nav">
+    <button class="mbtn" onclick="changeMonth(-1)">‹</button>
+    <span class="mlabel" id="month-label"></span>
+    <button class="mbtn" onclick="changeMonth(1)">›</button>
+  </div>
+</div>
+
+<div class="tbl-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="h-no">No</th>
+        <th class="h-name">利用者名</th>
+        <th class="h-kosin">更新申請他</th>
+        <th class="h-rot h-rot-date" id="th-yuko"><span class="inner">有効期間</span></th>
+        <th class="h-rot"><span class="inner">介護度</span></th>
+        <th class="h-rot h-rot-date" id="th-planL"><span class="inner">長期</span></th>
+        <th class="h-rot h-rot-date" id="th-planS"><span class="inner">短期</span></th>
+        <th class="h-rot h-visit"><span class="inner">訪問日</span></th>
+        <th class="h-rot"><span class="inner">モニ記録</span></th>
+        <th class="h-rot"><span class="inner">支援経過</span></th>
+        <th class="h-rot"><span class="inner">利用票ドライブ</span></th>
+        <th class="h-rot"><span class="inner">次月利用票</span></th>
+        <th class="h-rot"><span class="inner">次月提供票</span></th>
+        <th class="h-rot"><span class="inner">プラン作成</span></th>
+        <th class="h-rot"><span class="inner">担当者会議</span></th>
+        <th class="h-rot"><span class="inner">照会</span></th>
+        <th class="h-rot"><span class="inner">アセス</span></th>
+        <th class="h-rot h-seho"><span class="inner">生保</span></th>
+        <th class="h-biko">備考</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<div class="modal-bg" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-pill"></div>
+    <div class="modal-col" id="mc"></div>
+    <div class="modal-name" id="mn"></div>
+    <div class="macts" id="ma"></div>
+    <button class="modal-close" onclick="closeModal()">キャンセル</button>
+  </div>
+</div>
+
+<div class="confirm-bg" id="confirm">
+  <div class="confirm-box">
+    <div class="confirm-title" id="cf-title"></div>
+    <div class="confirm-msg" id="cf-msg"></div>
+    <div class="confirm-btns">
+      <button class="confirm-btn cancel" onclick="closeConfirm()">キャンセル</button>
+      <button class="confirm-btn ok" id="cf-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="import-data-input" accept=".json,application/json" style="display:none">
+
+<script>
+function toReiwa(y, m) {
+  const rYear = y - 2018;
+  return `R${rYear}.${String(m).padStart(2, '0')}`;
+}
+
+function reiwaLabel(y, m) {
+  return 'R' + (y - 2018) + '年' + m + '月';
+}
+
+const now = new Date();
+let curYear = now.getFullYear();
+let curMonth = now.getMonth() + 1;
+
+function monthKey(y, m) { return `${y}-${String(m).padStart(2, '0')}`; }
+
+const DEFAULT_CLIENTS = [];
+
+function makeRowId(base) {
+  if (base.rowId) return String(base.rowId);
+  const baseName = String(base.baseName || '').trim();
+  const name = String(base.name || '').trim();
+  if (baseName) return `base:${baseName}`;
+  if (name) return `name:${name}`;
+  return `custom:${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function newClientData(base) {
+  const visitState = parseVisitState(base);
+  return {
+    rowId: makeRowId(base),
+    name: base.name || '',
+    baseName: base.baseName !== undefined ? base.baseName : (base.name || ''),
+    customAdded: Boolean(base.customAdded),
+    noNumber: Boolean(base.noNumber),
+    deleted: Boolean(base.deleted),
+    manualOrder: Number.isFinite(base.manualOrder) ? base.manualOrder : null,
+    kana: base.kana || '',
+    facility: base.facility || '',
+    kosin: base.kosin || '',
+    yuko: base.yuko || '',
+    level: base.level || '',
+    planL: base.planL || '',
+    planS: base.planS || '',
+    seho: base.seho || '',
+    sehoCw: base.sehoCw || '',
+    kaigoken: base.kaigoken || '',
+    biko: base.biko || '',
+    visit: '',
+    visitDate: visitState.visitDate,
+    visitTag1: visitState.visitTag1,
+    visitTag2: visitState.visitTag2,
+    meetingDate: base.meetingDate || '',
+    meetingTag1: base.meetingTag1 || '',
+    meetingTag2: base.meetingTag2 || '',
+    monita: base.monita || 0,
+    sikien: base.sikien || 0,
+    drive: base.drive || 0,
+    hand: base.hand || 0,
+    fax: base.fax || 0,
+    plan: base.plan || 0,
+    meeting: base.meeting || 0,
+    shokai: base.shokai || 0,
+    assess: base.assess || 0
+  };
+}
+
+function parseVisitState(base) {
+  const raw = String(base.visit || '').trim();
+  return {
+    visitDate: base.visitDate || (/^\d{1,2}譌･$/.test(raw) ? raw : ''),
+    visitTag1: base.visitTag1 || (Boolean(base.visitTel) || raw === 'TEL' || raw === '髮ｻ隧ｱ' ? 'TEL' : Boolean(base.visitNyuin) || raw === '蜈･髯｢荳ｭ' ? '蜈･髯｢荳ｭ' : ''),
+    visitTag2: base.visitTag2 || ''
+  };
+}
+
+function normalizeSehoFields(item) {
+  if (item.sehoCw && !item.seho) item.seho = '○';
+  return item;
+}
+
+function hasVisitValue(item) {
+  return Boolean(item.visitDate || item.visitTag1 || item.visitTag2);
+}
+
+function hasMeetingValue(item) {
+  return Boolean(item.meetingDate || item.meetingTag1 || item.meetingTag2);
+}
+
+const STORAGE_KEY = 'riyosha_check_v1';
+const FAC_KEY = 'riyosha_facilities_v1';
+const ORDER_MODE_KEY = 'riyosha_order_mode_v1';
+const CHK = ['monita', 'sikien', 'drive', 'hand', 'fax'];
+const nameCollator = new Intl.Collator('ja', { sensitivity: 'base', numeric: true });
+const NAME_YOMI = {};
+const EXPORT_SCHEMA_VERSION = 1;
+let allDateReiwa = true;
+const visitChoices = ['TEL', '蜈･髯｢荳ｭ'];
+const levelChoices = ['謾ｯ1', '謾ｯ2', '1', '2', '3', '4', '5'];
+
+let currentData = [];
+let dragSrcIdx = null;
+let dragPointerId = null;
+let dragHoldTimer = null;
+let dragRowEl = null;
+let dragHoverRowEl = null;
+let modalIndex = -1;
+let visitPickerYear = 0;
+let visitPickerMonth = 0;
+let datePickerField = '';
+let pendingDateClick = null;
+let pendingVisitClick = null;
+let orderMode = 'name';
+let selectedRowId = '';
+let blankInsertMode = false;
+let blankInsertIndex = -1;
+
+function removeUnusedTaskHeaders() {
+  const headerRow = document.querySelector('thead tr');
+  if (!headerRow || headerRow.dataset.removedPlanShokai === '1') return;
+  const cells = headerRow.querySelectorAll('th');
+  [16, 15, 13].forEach(index => {
+    if (cells[index]) cells[index].remove();
+  });
+  headerRow.dataset.removedPlanShokai = '1';
+}
+
+function loadAll() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function loadOrderMode() {
+  try {
+    const saved = localStorage.getItem(ORDER_MODE_KEY);
+    return saved === 'custom' ? 'custom' : 'name';
+  } catch {
+    return 'name';
+  }
+}
+
+function saveOrderMode(mode) {
+  orderMode = mode === 'custom' ? 'custom' : 'name';
+  localStorage.setItem(ORDER_MODE_KEY, orderMode);
+}
+
+function saveAll(all) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+}
+
+function sortClientsByName(data) {
+  return [...data].sort((a, b) => {
+    if (orderMode === 'custom') {
+      const aOrder = Number.isFinite(a.manualOrder) ? a.manualOrder : Number.MAX_SAFE_INTEGER;
+      const bOrder = Number.isFinite(b.manualOrder) ? b.manualOrder : Number.MAX_SAFE_INTEGER;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+    }
+    if (a.noNumber !== b.noNumber) return a.noNumber ? 1 : -1;
+    const aName = String(a.name || '').trim();
+    const bName = String(b.name || '').trim();
+    const aYomi = String(a.kana || '').trim() || NAME_YOMI[aName] || aName;
+    const bYomi = String(b.kana || '').trim() || NAME_YOMI[bName] || bName;
+    return nameCollator.compare(aYomi, bYomi) || nameCollator.compare(aName, bName);
+  });
+}
+
+function mergeClientRecord(base, extra) {
+  const merged = { ...base };
+  Object.keys(extra).forEach(key => {
+    const value = extra[key];
+    if (value === undefined || value === null || value === '') return;
+    if (typeof value === 'number' && value === 0 && merged[key]) return;
+    merged[key] = value;
+  });
+  return normalizeSehoFields(merged);
+}
+
+function resolveKanaForName(name) {
+  const trimmed = String(name || '').trim();
+  if (!trimmed) return '';
+  if (NAME_YOMI[trimmed]) return String(NAME_YOMI[trimmed]);
+  const normalized = trimmed.replace(/\s+/g, '');
+  const fromCurrent = currentData.find(item => {
+    const itemName = String(item.name || '').trim();
+    const itemBaseName = String(item.baseName || '').trim();
+    return itemName === trimmed || itemBaseName === trimmed || itemName.replace(/\s+/g, '') === normalized || itemBaseName.replace(/\s+/g, '') === normalized;
+  });
+  if (fromCurrent && String(fromCurrent.kana || '').trim()) return String(fromCurrent.kana).trim();
+  const fromDefaults = DEFAULT_CLIENTS.find(item => {
+    const itemName = String(item.name || '').trim();
+    const itemBaseName = String(item.baseName || '').trim();
+    return itemName === trimmed || itemBaseName === trimmed || itemName.replace(/\s+/g, '') === normalized || itemBaseName.replace(/\s+/g, '') === normalized;
+  });
+  if (fromDefaults && String(fromDefaults.kana || '').trim()) return String(fromDefaults.kana).trim();
+  return '';
+}
+
+function fillKanaIfKnown(nameInputId, kanaInputId) {
+  const nameInput = document.getElementById(nameInputId);
+  const kanaInput = document.getElementById(kanaInputId);
+  if (!nameInput || !kanaInput) return;
+  const autoKana = resolveKanaForName(nameInput.value);
+  if (autoKana) kanaInput.value = autoKana;
+}
+
+function dedupeClients(data) {
+  const byName = new Map();
+  data.forEach(item => {
+    const name = String(item.name || '').trim();
+    const rowId = makeRowId(item);
+    const baseName = String(item.baseName || '').trim();
+    const key = rowId || baseName || name;
+    if (!key) return;
+    if (!byName.has(key)) {
+      byName.set(key, normalizeSehoFields({ ...item, rowId, name, baseName }));
+      return;
+    }
+    byName.set(key, mergeClientRecord(byName.get(key), { ...item, rowId, name, baseName }));
+  });
+  return Array.from(byName.values());
+}
+
+function syncClientList(data) {
+  const normalized = dedupeClients(data);
+  const byBaseName = new Map(normalized.map(item => [String(item.baseName || '').trim(), item]).filter(([key]) => key));
+  const byName = new Map(normalized.map(item => [item.name, item]));
+  const merged = [];
+  DEFAULT_CLIENTS.forEach(base => {
+    const existing = byBaseName.get(base.name) || byName.get(base.name);
+    if (!existing) {
+      merged.push(newClientData(base));
+      return;
+    }
+    if (existing.deleted) {
+      merged.push({
+        ...newClientData(base),
+        ...existing,
+        baseName: existing.baseName || base.name,
+        deleted: true
+      });
+      return;
+    }
+    const existingVisit = parseVisitState(existing);
+    merged.push({
+      ...newClientData(base),
+      ...existing,
+      baseName: existing.baseName || base.name,
+      customAdded: false,
+      deleted: false,
+      manualOrder: Number.isFinite(existing.manualOrder) ? existing.manualOrder : null,
+      kana: existing.kana !== undefined ? existing.kana : (base.kana || ''),
+      kosin: existing.kosin !== undefined ? existing.kosin : (base.kosin || ''),
+      yuko: existing.yuko !== undefined ? existing.yuko : (base.yuko || ''),
+      level: existing.level !== undefined ? existing.level : (base.level || ''),
+      planL: existing.planL !== undefined ? existing.planL : (base.planL || ''),
+      planS: existing.planS !== undefined ? existing.planS : (base.planS || ''),
+      visitDate: existingVisit.visitDate,
+      visitTag1: existingVisit.visitTag1,
+      visitTag2: existingVisit.visitTag2,
+      meetingDate: existing.meetingDate !== undefined ? existing.meetingDate : (base.meetingDate || ''),
+      meetingTag1: existing.meetingTag1 !== undefined ? existing.meetingTag1 : (base.meetingTag1 || ''),
+      meetingTag2: existing.meetingTag2 !== undefined ? existing.meetingTag2 : (base.meetingTag2 || ''),
+      seho: existing.seho !== undefined ? existing.seho : (base.seho || ''),
+      sehoCw: existing.sehoCw !== undefined ? existing.sehoCw : (base.sehoCw || ''),
+      kaigoken: existing.kaigoken !== undefined ? existing.kaigoken : (base.kaigoken || ''),
+      biko: existing.biko !== undefined ? existing.biko : (base.biko || '')
+    });
+  });
+  normalized.forEach(item => {
+    const isDefaultLinked = DEFAULT_CLIENTS.some(base => base.name === item.baseName || base.name === item.name);
+    if (!isDefaultLinked && item.customAdded && !item.deleted) merged.push(item);
+  });
+  return dedupeClients(merged);
+}
+
+function getMonthData(y, m) {
+  const all = loadAll();
+  const key = monthKey(y, m);
+  if (all[key]) {
+    all[key] = sortClientsByName(syncClientList(all[key]));
+    saveAll(all);
+    return all[key];
+  }
+
+  let pm = m - 1;
+  let py = y;
+  if (pm < 1) {
+    pm = 12;
+    py -= 1;
+  }
+  const prevKey = monthKey(py, pm);
+
+  if (all[prevKey] && all[prevKey].length > 0) {
+    all[key] = all[prevKey].map(c => ({
+      ...c,
+      kosin: '',
+      visit: '',
+      visitDate: '',
+      visitTag1: '',
+      visitTag2: '',
+      meetingDate: '',
+      meetingTag1: '',
+      meetingTag2: '',
+      monita: 0,
+      sikien: 0,
+      drive: 0,
+      hand: 0,
+      fax: 0,
+      plan: 0,
+      meeting: 0,
+      shokai: 0,
+      assess: 0
+    }));
+  } else {
+    all[key] = DEFAULT_CLIENTS.map(newClientData);
+  }
+
+  all[key] = sortClientsByName(syncClientList(all[key]));
+
+  saveAll(all);
+  return all[key];
+}
+
+function saveMonthData(y, m, data) {
+  const all = loadAll();
+  all[monthKey(y, m)] = sortClientsByName(dedupeClients(data));
+  saveAll(all);
+}
+
+function loadFacilities() {
+  try {
+    return JSON.parse(localStorage.getItem(FAC_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveFacilities(list) {
+  localStorage.setItem(FAC_KEY, JSON.stringify(list));
+}
+
+function buildExportPayload() {
+  return {
+    schemaVersion: EXPORT_SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
+    appTitle: document.querySelector('.app-name')?.textContent || '',
+    data: loadAll(),
+    facilities: loadFacilities(),
+    orderMode: loadOrderMode()
+  };
+}
+
+function exportLocalData() {
+  const payload = buildExportPayload();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `利用者チェック表_個人データ_${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function triggerImportLocalData() {
+  const input = document.getElementById('import-data-input');
+  if (!input) return;
+  input.value = '';
+  input.click();
+}
+
+function importLocalDataFromFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(String(reader.result || '{}'));
+      const data = parsed && typeof parsed === 'object' ? parsed.data : null;
+      const facilities = parsed && typeof parsed === 'object' ? parsed.facilities : null;
+      const importedOrderMode = parsed && typeof parsed === 'object' ? parsed.orderMode : null;
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('invalid');
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      localStorage.setItem(FAC_KEY, JSON.stringify(Array.isArray(facilities) ? facilities : []));
+      localStorage.setItem(ORDER_MODE_KEY, importedOrderMode === 'custom' ? 'custom' : 'name');
+      orderMode = loadOrderMode();
+      currentData = getMonthData(curYear, curMonth);
+      render();
+      alert('個人データを読み込みました');
+    } catch {
+      alert('読み込みに失敗しました。バックアップJSONを選択してください。');
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function esc(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function getPeriodFieldLabel(field) {
+  if (field === 'yuko') return '有効期間';
+  if (field === 'planL') return '長期';
+  return '短期';
+}
+
+function shortDate(value) {
+  if (!value) return '';
+  const parsed = parseAnyDate(value);
+  if (!parsed) return String(value).replace(/\./g, '/');
+  if (allDateReiwa) return formatWareki(parsed.year, parsed.month, parsed.day);
+  const year = String(parsed.year);
+  const month = String(parsed.month).padStart(2, '0');
+  const day = String(parsed.day).padStart(2, '0');
+  return `${year}/${month}/${day}`;
+}
+
+function getYukoStatus(value) {
+  const parsed = parseAnyDate(value);
+  if (!parsed) return '';
+  const today = new Date();
+  const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const redStart = new Date(parsed.year, parsed.month - 3, 1);
+  const grayStart = new Date(parsed.year, parsed.month - 2, 1);
+  const nextCertStart = new Date(parsed.year, parsed.month, 1);
+  if (currentMonthStart >= nextCertStart) return 'blank';
+  if (currentMonthStart >= grayStart) return 'done';
+  if (currentMonthStart >= redStart) return 'soon';
+  return '';
+}
+
+function isExpiringSoon(value) {
+  return getYukoStatus(value) === 'soon';
+}
+
+function isExpiringProcedureDone(value) {
+  return getYukoStatus(value) === 'done';
+}
+
+function isNewCertificationStarted(value) {
+  return getYukoStatus(value) === 'blank';
+}
+
+function isCurrentShortPlan(value) {
+  if (!value) return false;
+  const match = value.match(/R(\d+)\.(\d+)\.(\d+)/);
+  if (!match) return false;
+  const y = parseInt(match[1], 10) + 2018;
+  const m = parseInt(match[2], 10);
+  const start = new Date(y, m - 1, 1);
+  return new Date() >= start;
+}
+
+function isCurrentLongPlan(value) {
+  if (!value) return false;
+  const match = value.match(/R(\d+)\.(\d+)\.(\d+)/);
+  if (!match) return false;
+  const y = parseInt(match[1], 10) + 2018;
+  const m = parseInt(match[2], 10);
+  const start = new Date(y, m - 1, 1);
+  return new Date() >= start;
+}
+
+function parseWareki(value) {
+  if (!value) return null;
+  const match = String(value).trim().match(/^R(\d+)\.(\d+)\.(\d+)$/);
+  if (!match) return null;
+  return {
+    year: parseInt(match[1], 10) + 2018,
+    month: parseInt(match[2], 10),
+    day: parseInt(match[3], 10)
+  };
+}
+
+function formatWareki(year, month, day) {
+  return `R${year - 2018}.${month}.${day}`;
+}
+
+function parseAnyDate(value) {
+  if (!value) return null;
+  const wareki = parseWareki(value);
+  if (wareki) return wareki;
+  const match = String(value).trim().match(/^(\d{4})[\/.](\d{1,2})[\/.](\d{1,2})$/);
+  if (!match) return null;
+  return {
+    year: parseInt(match[1], 10),
+    month: parseInt(match[2], 10),
+    day: parseInt(match[3], 10)
+  };
+}
+
+function changeMonth(dir) {
+  curMonth += dir;
+  if (curMonth > 12) {
+    curMonth = 1;
+    curYear += 1;
+  }
+  if (curMonth < 1) {
+    curMonth = 12;
+    curYear -= 1;
+  }
+  render();
+}
+
+function toggleAllDateMode() {
+  allDateReiwa = !allDateReiwa;
+  render();
+}
+
+function toggleOrderMode() {
+  saveOrderMode(orderMode === 'custom' ? 'name' : 'custom');
+  render();
+}
+
+function tog(i, key) {
+  currentData[i][key] = currentData[i][key] === 1 ? 0 : 1;
+  saveMonthData(curYear, curMonth, currentData);
+  render();
+}
+
+function openVisit(i) {
+  modalIndex = i;
+  const current = currentData[i];
+  const modal = document.getElementById('modal');
+  modal.classList.add('calendar-picker');
+  modal.classList.add('visit-calendar-open');
+  datePickerField = 'visitDate';
+  visitPickerYear = curYear;
+  visitPickerMonth = curMonth;
+  const parsed = parseAnyDate(current.visitDate);
+  if (parsed) {
+    visitPickerYear = parsed.year;
+    visitPickerMonth = parsed.month;
+  }
+  showModal('訪問日', currentData[i].name,
+    `<div class="calendar-box visit-calendar-box">
+      <div class="calendar-head">
+        <button class="calendar-nav" onclick="changeVisitMonth(-1)">‹</button>
+        <div class="calendar-selects">
+          <select class="calendar-select" id="visit-calendar-year" onchange="jumpVisitCalendar()"></select>
+          <select class="calendar-select" id="visit-calendar-month" onchange="jumpVisitCalendar()"></select>
+        </div>
+        <button class="calendar-nav" onclick="changeVisitMonth(1)">›</button>
+      </div>
+      <div class="calendar-weekdays">
+        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+      <div class="calendar-grid" id="visit-calendar-grid"></div>
+      <div class="visit-subactions">
+        ${visitChoices.map(label => `<button class="mact${isVisitTagSelected(current, label) ? ' sel' : ''}" onclick="toggleVisitFlag('${label}')">${label}</button>`).join('')}
+      </div>
+      <div class="visit-free-inputs">
+        <input class="modal-input" id="visit-date-free" placeholder="日付" value="${esc(current.visitDate || '')}" oninput="updateVisitFreeField('visitDate', this.value)">
+        <input class="modal-input" id="visit-tag1-free" placeholder="下段1" value="${esc(current.visitTag1 || '')}" oninput="updateVisitFreeField('visitTag1', this.value)">
+        <input class="modal-input" id="visit-tag2-free" placeholder="下段2" value="${esc(current.visitTag2 || '')}" oninput="updateVisitFreeField('visitTag2', this.value)">
+      </div>
+      <div class="visit-modal-actions">
+        <button class="mact red" onclick="clearVisit(modalIndex, true)">クリア</button>
+        <button class="mact green" onclick="closeModal();render();">OK</button>
+      </div>
+      <button class="modal-close visit-cancel-btn" onclick="closeModal()">キャンセル</button>
+    </div>`
+  );
+  renderVisitCalendar();
+}
+
+function setVisitDate(value) {
+  currentData[modalIndex].visitDate = value;
+  currentData[modalIndex].visit = '';
+  saveMonthData(curYear, curMonth, currentData);
+  render();
+  openVisit(modalIndex);
+}
+
+function toggleVisitFlag(label) {
+  const item = currentData[modalIndex];
+  if (item.visitTag1 === label) item.visitTag1 = '';
+  else if (item.visitTag2 === label) item.visitTag2 = '';
+  else if (!item.visitTag1) item.visitTag1 = label;
+  else if (!item.visitTag2) item.visitTag2 = label;
+  else item.visitTag2 = label;
+  normalizeVisitTags(item);
+  currentData[modalIndex].visit = '';
+  saveMonthData(curYear, curMonth, currentData);
+  render();
+  openVisit(modalIndex);
+}
+
+function clearVisit(i, keepModalOpen) {
+  currentData[i].visit = '';
+  currentData[i].visitDate = '';
+  currentData[i].visitTag1 = '';
+  currentData[i].visitTag2 = '';
+  saveMonthData(curYear, curMonth, currentData);
+  render();
+  if (keepModalOpen) {
+    openVisit(i);
+    return;
+  }
+}
+
+function isVisitTagSelected(item, label) {
+  return item.visitTag1 === label || item.visitTag2 === label;
+}
+
+function normalizeVisitTags(item) {
+  const tags = [item.visitTag1, item.visitTag2].filter(Boolean);
+  item.visitTag1 = tags[0] || '';
+  item.visitTag2 = tags[1] || '';
+}
+
+function updateVisitFreeField(field, value) {
+  currentData[modalIndex][field] = value.trim();
+  currentData[modalIndex].visit = '';
+  if (field === 'visitTag1' || field === 'visitTag2') normalizeVisitTags(currentData[modalIndex]);
+  saveMonthData(curYear, curMonth, currentData);
+  render();
+}
+
+function openMeeting(i) {
+  modalIndex = i;
+  const current = currentData[i];
+  const modal = document.getElementById('modal');
+  modal.classList.add('calendar-picker');
+  modal.classList.add('visit-calendar-open');
+  datePickerField = 'meetingDate';
+  visitPickerYear = curYear;
+  visitPickerMonth = curMonth;
+  const parsed = parseAnyDate(current.meetingDate);
+  if (parsed) {
+    visitPickerYear = parsed.year;
+    visitPickerMonth = parsed.month;
+  }
+  showModal('担当者会議', currentData[i].name,
+    `<div class="calendar-box visit-calendar-box">
+      <div class="calendar-head">
+        <button class="calendar-nav" onclick="changeVisitMonth(-1)">‹</button>
+        <div class="calendar-selects">
+          <select class="calendar-select" id="visit-calendar-year" onchange="jumpVisitCalendar()"></select>
+          <select class="calendar-select" id="visit-calendar-month" onchange="jumpVisitCalendar()"></select>
+        </div>
+        <button class="calendar-nav" onclick="changeVisitMonth(1)">›</button>
+      </div>
+      <div class="calendar-weekdays">
+        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+      <div class="calendar-grid" id="visit-calendar-grid"></div>
+      <div class="visit-free-inputs">
+        <input class="modal-input" id="meeting-date-free" placeholder="日付" value="${esc(current.meetingDate || '')}" oninput="updateMeetingFreeField('meetingDate', this.value)">
+        <input class="modal-input" id="meeting-tag1-free" placeholder="下段1" value="${esc(current.meetingTag1 || '')}" oninput="updateMeetingFreeField('meetingTag1', this.value)">
+        <input class="modal-input" id="meeting-tag2-free" placeholder="下段2" value="${esc(current.meetingTag2 || '')}" oninput="updateMeetingFreeField('meetingTag2', this.value)">
+      </div>
+      <div class="visit-modal-actions">
+        <button class="mact red" onclick="clearMeeting(modalIndex, true)">クリア</button>
+        <button class="mact green" onclick="closeModal();render();">OK</button>
+      </div>
+      <button class="modal-close visit-cancel-btn" onclick="closeModal()">キャンセル</button>
+    </div>`
+  );
+  renderVisitCalendar();
+}
+
+function updateMeetingFreeField(field, value) {
+  currentData[modalIndex][field] = value.trim();
+  saveMonthData(curYear, curMonth, currentData);
+  render();
+}
+
+function clearMeeting(i, keepModalOpen) {
+  currentData[i].meetingDate = '';
+  currentData[i].meetingTag1 = '';
+  currentData[i].meetingTag2 = '';
+  saveMonthData(curYear, curMonth, currentData);
+  render();
+  if (keepModalOpen) {
+    openMeeting(i);
+    return;
+  }
+}
+
+function changeVisitMonth(dir) {
+  visitPickerMonth += dir;
+  if (visitPickerMonth > 12) {
+    visitPickerMonth = 1;
+    visitPickerYear += 1;
+  }
+  if (visitPickerMonth < 1) {
+    visitPickerMonth = 12;
+    visitPickerYear -= 1;
+  }
+  renderVisitCalendar();
+}
+
+function jumpVisitCalendar() {
+  const year = document.getElementById('visit-calendar-year');
+  const month = document.getElementById('visit-calendar-month');
+  if (!year || !month) return;
+  visitPickerYear = parseInt(year.value, 10);
+  visitPickerMonth = parseInt(month.value, 10);
+  renderVisitCalendar();
+}
+
+function renderVisitCalendar() {
+  const yearSelect = document.getElementById('visit-calendar-year');
+  const monthSelect = document.getElementById('visit-calendar-month');
+  const grid = document.getElementById('visit-calendar-grid');
+  if (!yearSelect || !monthSelect || !grid) return;
+  renderCalendarSelects(yearSelect, monthSelect, visitPickerYear, visitPickerMonth);
+  grid.innerHTML = '';
+
+  const selectedRaw = String(currentData[modalIndex][datePickerField] || '');
+  let selectedDay = null;
+  if (datePickerField === 'visitDate' || datePickerField === 'meetingDate') {
+    const match = selectedRaw.match(/^(\d{1,2})譌･$/);
+    selectedDay = match ? parseInt(match[1], 10) : null;
+  } else {
+    const parsed = parseAnyDate(selectedRaw);
+    selectedDay = parsed && parsed.year === visitPickerYear && parsed.month === visitPickerMonth ? parsed.day : null;
+  }
+  const firstWeekday = new Date(visitPickerYear, visitPickerMonth - 1, 1).getDay();
+  const daysInMonth = new Date(visitPickerYear, visitPickerMonth, 0).getDate();
+
+  for (let i = 0; i < firstWeekday; i += 1) {
+    const blank = document.createElement('button');
+    blank.className = 'calendar-day blank';
+    blank.disabled = true;
+    blank.textContent = '';
+    grid.appendChild(blank);
+  }
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const btn = document.createElement('button');
+    btn.className = `calendar-day${selectedDay === day ? ' sel' : ''}`;
+    btn.textContent = String(day);
+    btn.onclick = () => {
+      if (datePickerField === 'visitDate') {
+        if (selectedDay === day) {
+          currentData[modalIndex].visitDate = '';
+          currentData[modalIndex].visit = '';
+          saveMonthData(curYear, curMonth, currentData);
+          render();
+          openVisit(modalIndex);
+          return;
+        }
+        setVisitDate(`${day}譌･`);
+        return;
+      }
+      if (datePickerField === 'meetingDate') {
+        if (selectedDay === day) {
+          currentData[modalIndex].meetingDate = '';
+          saveMonthData(curYear, curMonth, currentData);
+          render();
+          openMeeting(modalIndex);
+          return;
+        }
+        currentData[modalIndex].meetingDate = `${day}譌･`;
+        saveMonthData(curYear, curMonth, currentData);
+        render();
+        openMeeting(modalIndex);
+        return;
+      }
+      if (selectedDay === day) {
+        currentData[modalIndex][datePickerField] = '';
+        saveMonthData(curYear, curMonth, currentData);
+        openPeriodDatePicker(modalIndex, datePickerField, getPeriodFieldLabel(datePickerField));
+        return;
+      }
+      currentData[modalIndex][datePickerField] = formatWareki(visitPickerYear, visitPickerMonth, day);
+      saveMonthData(curYear, curMonth, currentData);
+      openPeriodDatePicker(modalIndex, datePickerField, getPeriodFieldLabel(datePickerField));
+    };
+    grid.appendChild(btn);
+  }
+}
+
+function renderCalendarSelects(yearSelect, monthSelect, year, month) {
+  const startYear = Math.max(2019, curYear - 8);
+  const endYear = curYear + 12;
+  yearSelect.innerHTML = '';
+  for (let y = startYear; y <= endYear; y += 1) {
+    const option = document.createElement('option');
+    option.value = String(y);
+    option.textContent = String(y) + '年（R' + String(y - 2018) + '）';
+    option.selected = y === year;
+    yearSelect.appendChild(option);
+  }
+  monthSelect.innerHTML = '';
+  for (let m = 1; m <= 12; m += 1) {
+    const option = document.createElement('option');
+    option.value = String(m);
+    option.textContent = String(m) + '月';
+    option.selected = m === month;
+    monthSelect.appendChild(option);
+  }
+}
+
+function openPeriodDatePicker(i, field, label) {
+  modalIndex = i;
+  datePickerField = field;
+  const modal = document.getElementById('modal');
+  modal.classList.add('calendar-picker');
+  const parsed = parseAnyDate(currentData[i][field]) || { year: curYear, month: curMonth, day: null };
+  visitPickerYear = parsed.year;
+  visitPickerMonth = parsed.month;
+  showModal(label, currentData[i].name,
+    `<div class="calendar-box">
+      <div class="calendar-head">
+        <button class="calendar-nav" onclick="changeVisitMonth(-1)">‹</button>
+        <div class="calendar-selects">
+          <select class="calendar-select" id="visit-calendar-year" onchange="jumpVisitCalendar()"></select>
+          <select class="calendar-select" id="visit-calendar-month" onchange="jumpVisitCalendar()"></select>
+        </div>
+        <button class="calendar-nav" onclick="changeVisitMonth(1)">›</button>
+      </div>
+      <div class="calendar-weekdays">
+        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+      <div class="calendar-grid" id="visit-calendar-grid"></div>
+      <div class="visit-modal-actions">
+        <button class="mact red" onclick="clearDateField(modalIndex, '${field}', true)">クリア</button>
+        <button class="mact green" onclick="closeModal();render();">OK</button>
+      </div>
+    </div>`
+  );
+  renderVisitCalendar();
+}
+
+function clearDateField(i, field, keepModalOpen) {
+  currentData[i][field] = '';
+  saveMonthData(curYear, curMonth, currentData);
+  if (keepModalOpen) {
+    openPeriodDatePicker(i, field, getPeriodFieldLabel(field));
+    return;
+  }
+  render();
+}
+
+function bindDateCell(td, onClick, onDoubleClick) {
+  td.addEventListener('dblclick', event => {
+    event.stopPropagation();
+    clearTimeout(pendingDateClick);
+    pendingDateClick = null;
+    (onDoubleClick || onClick)();
+  });
+}
+
+function openLevelPicker(i) {
+  modalIndex = i;
+  const current = String(currentData[i].level || '');
+  const modal = document.getElementById('modal');
+  modal.classList.add('compact-picker');
+  showModal('介護度', currentData[i].name,
+    `<div style="display:flex;gap:6px;flex-wrap:wrap;">
+      ${levelChoices.map(level => `<button class="mact${current === level ? ' sel' : ''}" style="flex:none;min-width:40px;padding:8px 6px" onclick="setLevel('${level}')">${level}</button>`).join('')}
+    </div>`
+  );
+}
+
+function setLevel(value) {
+  currentData[modalIndex].level = value;
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function openBiko(i) {
+  modalIndex = i;
+  document.getElementById('modal').classList.add('compact-picker');
+  showModal('備考', currentData[i].name,
+    `<textarea class="modal-textarea" id="bi">${esc(currentData[i].biko || '')}</textarea>
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveBiko()">保存する</button>`
+  );
+  setTimeout(() => {
+    const textarea = document.getElementById('bi');
+    if (textarea) textarea.focus();
+  }, 100);
+}
+
+function openKosin(i) {
+  modalIndex = i;
+  document.getElementById('modal').classList.add('compact-picker');
+  showModal('更新申請他', currentData[i].name,
+    `<input class="modal-input" id="kosin-input" placeholder="例: 7/1更新" value="${esc(currentData[i].kosin || '')}">
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveKosin()">保存する</button>`
+  );
+  setTimeout(() => {
+    const input = document.getElementById('kosin-input');
+    if (input) input.focus();
+  }, 100);
+}
+
+function saveKosin() {
+  const input = document.getElementById('kosin-input');
+  if (!input) return;
+  currentData[modalIndex].kosin = input.value.trim();
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function saveBiko() {
+  const textarea = document.getElementById('bi');
+  if (!textarea) return;
+  currentData[modalIndex].biko = textarea.value.trim();
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function openMarkerField(i, field, label, placeholder) {
+  modalIndex = i;
+  const current = currentData[i][field] || '';
+  showModal(label, currentData[i].name,
+    `<input class="modal-input" id="marker-input" placeholder="${esc(placeholder)}" value="${esc(current)}">
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveMarkerField('${field}')">保存する</button>
+     <button class="mact red" style="width:100%;margin-top:8px" onclick="clearMarkerField('${field}')">クリア</button>`
+  );
+  setTimeout(() => {
+    const input = document.getElementById('marker-input');
+    if (input) input.focus();
+  }, 100);
+}
+
+function saveMarkerField(field) {
+  const input = document.getElementById('marker-input');
+  if (!input) return;
+  currentData[modalIndex][field] = input.value.trim();
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function clearMarkerField(field) {
+  currentData[modalIndex][field] = '';
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function openSehoEditor(i) {
+  modalIndex = i;
+  const item = currentData[i];
+  showModal('保護', item.name,
+    `<label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #b3e89a;border-radius:10px;background:#f9fef5;margin-bottom:8px;cursor:pointer">
+       <input type="checkbox" id="seho-mark-input" ${item.seho ? 'checked' : ''} style="width:18px;height:18px;accent-color:#65b842">
+       <span style="font-size:13px;font-weight:700;color:#1a4d0e">生活保護あり</span>
+     </label>
+     <input class="modal-input" id="seho-cw-input" placeholder="下段 例: 山田CW" value="${esc(item.sehoCw || '')}">
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveSehoEditor()">保存する</button>
+     <button class="mact red" style="width:100%;margin-top:8px" onclick="clearSehoEditor()">クリア</button>`
+  );
+  document.getElementById('modal').classList.add('compact-picker');
+  setTimeout(() => {
+    const input = document.getElementById('seho-cw-input');
+    if (input) input.focus();
+  }, 100);
+}
+
+function saveSehoEditor() {
+  currentData[modalIndex].seho = document.getElementById('seho-mark-input')?.checked ? '○' : '';
+  currentData[modalIndex].sehoCw = (document.getElementById('seho-cw-input')?.value || '').trim();
+  normalizeSehoFields(currentData[modalIndex]);
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function clearSehoEditor() {
+  currentData[modalIndex].seho = '';
+  currentData[modalIndex].sehoCw = '';
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function openVisitTextEditor(i, focusFieldId) {
+  modalIndex = i;
+  const item = currentData[i];
+  showModal('訪問日を編集', item.name,
+    `<input class="modal-input" id="visit-date-input" placeholder="日付" value="${esc(item.visitDate || '')}">
+     <input class="modal-input" id="visit-tag1-input" placeholder="下段1" value="${esc(item.visitTag1 || '')}">
+     <input class="modal-input" id="visit-tag2-input" placeholder="下段2" value="${esc(item.visitTag2 || '')}">
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveVisitTextEditor()">保存する</button>
+     <button class="mact red" style="width:100%;margin-top:8px" onclick="clearVisit(modalIndex);closeModal()">クリア</button>`
+  );
+  document.getElementById('modal').classList.add('compact-picker');
+  setTimeout(() => {
+    const input = document.getElementById(focusFieldId || 'visit-date-input');
+    if (input) input.focus();
+  }, 100);
+}
+
+function saveVisitTextEditor() {
+  const item = currentData[modalIndex];
+  item.visitDate = (document.getElementById('visit-date-input')?.value || '').trim();
+  item.visitTag1 = (document.getElementById('visit-tag1-input')?.value || '').trim();
+  item.visitTag2 = (document.getElementById('visit-tag2-input')?.value || '').trim();
+  item.visit = '';
+  normalizeVisitTags(item);
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function openAddClient() {
+  showModal('利用者を追加', '新規',
+    `<input class="modal-input" id="add-name" placeholder="利用者名" oninput="fillKanaIfKnown('add-name','add-kana')" onchange="fillKanaIfKnown('add-name','add-kana')" onblur="fillKanaIfKnown('add-name','add-kana')">
+     <input class="modal-input" id="add-kana" placeholder="かな">
+     <input class="modal-input" id="add-yuko" placeholder="有効期限 例: R9.10.31">
+     <input class="modal-input" id="add-level" placeholder="介護度 例: 2">
+     <input class="modal-input" id="add-planL" placeholder="プラン長期 例: R9.10.31">
+     <input class="modal-input" id="add-planS" placeholder="プラン短期 例: R9.4.30">
+     <input class="modal-input" id="add-seho-cw" placeholder="保護 例: 山田CW">
+     <button class="mact green" style="width:100%;margin-top:4px" onclick="addClient()">追加する</button>`
+  );
+  document.getElementById('modal').classList.add('add-client');
+  setTimeout(() => {
+    const input = document.getElementById('add-name');
+    if (input) input.focus();
+  }, 100);
+}
+
+function addClient() {
+  const get = id => (document.getElementById(id)?.value || '').trim();
+  const name = get('add-name');
+  if (!name) {
+    alert('利用者名を入力してください');
+    return;
+  }
+  if (currentData.some(item => !item.deleted && String(item.name || '').trim() === name)) {
+    alert('同じ利用者名があります。追加せず既存データを確認してください');
+    return;
+  }
+  currentData.push(newClientData({
+    name,
+    kana: get('add-kana') || resolveKanaForName(name),
+    customAdded: true,
+    yuko: get('add-yuko'),
+    level: get('add-level'),
+    planL: get('add-planL'),
+    planS: get('add-planS'),
+    seho: get('add-seho-cw') ? '○' : '',
+    sehoCw: get('add-seho-cw')
+  }));
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function addBlankClientRow() {
+  blankInsertMode = !blankInsertMode;
+  const visibleData = currentData.filter(item => !item.deleted);
+  blankInsertIndex = blankInsertMode ? visibleData.length : -1;
+  render();
+}
+
+function insertBlankClientRow(insertIndex = blankInsertIndex) {
+  const visibleData = currentData.filter(item => !item.deleted);
+  const safeInsertIndex = Math.max(0, Math.min(visibleData.length, insertIndex));
+  const blankItem = newClientData({
+    name: '',
+    kana: '',
+    customAdded: true,
+    noNumber: true,
+    baseName: ''
+  });
+  const orderedVisible = [...visibleData];
+  orderedVisible.splice(safeInsertIndex, 0, blankItem);
+  orderedVisible.forEach((item, index) => {
+    item.manualOrder = index;
+  });
+  const hiddenData = currentData.filter(item => item.deleted).map(item => ({ ...item }));
+  currentData = [...orderedVisible, ...hiddenData];
+  blankInsertMode = false;
+  blankInsertIndex = -1;
+  selectedRowId = blankItem.rowId;
+  saveOrderMode('custom');
+  saveMonthData(curYear, curMonth, currentData);
+  render();
+}
+
+function openAddFacility() {
+  const options = currentData.map((c, i) => `
+    <label style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #e8f5e0;cursor:pointer">
+      <input type="checkbox" id="fac-chk-${i}" style="width:18px;height:18px;accent-color:#65b842">
+      <span style="font-size:13px;font-weight:700;color:#1a4d0e">${esc(c.name)}</span>
+      ${c.facility ? `<span style="font-size:11px;color:#94a3b8">(${esc(c.facility)})</span>` : ''}
+    </label>
+  `).join('');
+  showModal('施設を追加', '',
+    `<input class="modal-input" id="new-fac-name" placeholder="施設名を入力">
+     <div style="font-size:11px;color:#94a3b8;margin:8px 0 4px">対象の利用者を選択</div>
+     <div style="max-height:260px;overflow-y:auto;border:1.5px solid #b3e89a;border-radius:10px;padding:0 10px;background:#f9fef5">${options}</div>
+     <button class="mact green" style="width:100%;margin-top:10px" onclick="saveNewFacility()">保存する</button>`
+  );
+}
+
+function saveNewFacility() {
+  const name = (document.getElementById('new-fac-name')?.value || '').trim();
+  if (!name) {
+    alert('施設名を入力してください');
+    return;
+  }
+  const facilities = loadFacilities();
+  if (!facilities.includes(name)) {
+    facilities.push(name);
+    saveFacilities(facilities);
+  }
+  currentData.forEach((item, index) => {
+    const checked = document.getElementById(`fac-chk-${index}`);
+    if (checked?.checked) item.facility = name;
+  });
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function openNameEditor(i) {
+  modalIndex = i;
+  const item = currentData[i];
+  showModal('氏名', item.name,
+    `<input class="modal-input" id="edit-name-input" placeholder="氏名" value="${esc(item.name || '')}" oninput="fillKanaIfKnown('edit-name-input','edit-kana-input')" onchange="fillKanaIfKnown('edit-name-input','edit-kana-input')" onblur="fillKanaIfKnown('edit-name-input','edit-kana-input')">
+     <input class="modal-input" id="edit-kana-input" placeholder="かな" value="${esc(item.kana || '')}">
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveNameEditor()">保存する</button>
+     <button class="mact red" style="width:100%;margin-top:8px" onclick="confirmDelete(modalIndex)">削除</button>`
+  );
+  document.getElementById('modal').classList.add('compact-picker');
+  setTimeout(() => {
+    const input = document.getElementById('edit-name-input');
+    if (input) input.focus();
+  }, 100);
+}
+
+function selectRow(i) {
+  const rowId = currentData[i]?.rowId || '';
+  selectedRowId = selectedRowId === rowId ? '' : rowId;
+  render();
+}
+
+function bindRowSelection(cell, i) {
+  cell.addEventListener('click', event => {
+    if (dragRowEl) return;
+    if (blankInsertMode) {
+      event.stopPropagation();
+      insertBlankClientRow(i);
+      return;
+    }
+    event.stopPropagation();
+    selectRow(i);
+  });
+}
+
+function updateBlankInsertHighlight() {
+  const rows = Array.from(document.querySelectorAll('#tbody tr'));
+  rows.forEach((row, index) => {
+    row.classList.toggle('blank-insert-target', blankInsertMode && blankInsertIndex === index);
+  });
+  if (blankInsertMode && blankInsertIndex >= rows.length) {
+    const lastRow = rows[rows.length - 1];
+    if (lastRow) lastRow.classList.add('blank-insert-target');
+  }
+}
+
+function saveNameEditor() {
+  const name = (document.getElementById('edit-name-input')?.value || '').trim();
+  if (!name) {
+    alert('氏名を入力してください');
+    return;
+  }
+  currentData[modalIndex].name = name;
+  currentData[modalIndex].kana = (document.getElementById('edit-kana-input')?.value || '').trim() || resolveKanaForName(name);
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function cellEdit(td, i, field, currentValue, multiline) {
+  if (td.querySelector('input,textarea')) return;
+  const original = td.innerHTML;
+  td.innerHTML = '';
+  const input = document.createElement(multiline ? 'textarea' : 'input');
+  input.value = currentValue || '';
+  input.style.cssText = `width:100%;font-size:11px;font-family:inherit;border:1.5px solid #65b842;border-radius:4px;padding:2px 4px;background:#f9fef5;color:#1a4d0e;box-sizing:border-box;${multiline ? 'height:60px;resize:none;' : ''}`;
+  td.appendChild(input);
+  input.focus();
+  input.select();
+
+  function save() {
+    currentData[i][field] = input.value.trim();
+    if (field === 'visitDate') currentData[i].visit = '';
+    saveMonthData(curYear, curMonth, currentData);
+    render();
+  }
+
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !multiline) {
+      event.preventDefault();
+      save();
+    }
+    if (event.key === 'Escape') {
+      td.innerHTML = original;
+    }
+  });
+}
+
+function showModal(col, name, html) {
+  document.getElementById('mc').textContent = col;
+  document.getElementById('mn').textContent = name;
+  document.getElementById('ma').innerHTML = html;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show', 'add-client', 'compact-picker', 'calendar-picker', 'visit-calendar-open');
+  datePickerField = '';
+}
+
+function confirmDelete(i) {
+  closeModal();
+  const name = currentData[i].name;
+  document.getElementById('cf-title').textContent = '利用者を削除';
+  document.getElementById('cf-msg').textContent = `${name} を一覧から削除しますか？`;
+  document.getElementById('cf-ok').onclick = () => {
+    const item = currentData[i];
+    const isDefaultLinked = DEFAULT_CLIENTS.some(base => base.name === item.baseName);
+    if (isDefaultLinked) {
+      currentData[i] = { ...item, deleted: true };
+    } else {
+      currentData.splice(i, 1);
+    }
+    saveMonthData(curYear, curMonth, currentData);
+    closeConfirm();
+    render();
+  };
+  document.getElementById('confirm').classList.add('show');
+}
+
+function closeConfirm() {
+  document.getElementById('confirm').classList.remove('show');
+}
+
+function clearDragState() {
+  clearTimeout(dragHoldTimer);
+  dragHoldTimer = null;
+  dragPointerId = null;
+  dragSrcIdx = null;
+  if (dragRowEl) dragRowEl.classList.remove('row-dragging');
+  if (dragHoverRowEl) dragHoverRowEl.classList.remove('row-drop-target');
+  dragRowEl = null;
+  dragHoverRowEl = null;
+  document.body.classList.remove('drag-sorting');
+}
+
+function saveManualRowOrder() {
+  const rows = Array.from(document.querySelectorAll('#tbody tr'));
+  const ordered = [];
+  rows.forEach((row, index) => {
+    const sourceIndex = parseInt(row.dataset.sourceIndex || '-1', 10);
+    if (sourceIndex < 0 || !currentData[sourceIndex]) return;
+    ordered.push({ ...currentData[sourceIndex], manualOrder: index });
+  });
+  if (ordered.length === currentData.length) {
+    currentData = ordered;
+    saveMonthData(curYear, curMonth, currentData);
+  }
+}
+
+function startRowHold(event, sourceIndex) {
+  if (orderMode !== 'custom') return;
+  if (event.pointerType === 'mouse' && event.button !== 0) return;
+  const rowId = currentData[sourceIndex]?.rowId || '';
+  if (!rowId || selectedRowId !== rowId) return;
+  clearTimeout(dragHoldTimer);
+  dragPointerId = event.pointerId;
+  dragSrcIdx = sourceIndex;
+  const cell = event.currentTarget;
+  if (cell.setPointerCapture) cell.setPointerCapture(event.pointerId);
+  const activateDrag = () => {
+    const row = cell.closest('tr');
+    if (!row) return;
+    dragRowEl = row;
+    dragRowEl.classList.add('row-dragging');
+    document.body.classList.add('drag-sorting');
+  };
+  if (event.pointerType === 'mouse') {
+    activateDrag();
+    return;
+  }
+  dragHoldTimer = setTimeout(activateDrag, 450);
+}
+
+function moveHeldRow(event) {
+  if (!dragRowEl || dragPointerId !== event.pointerId) return;
+  event.preventDefault();
+  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('#tbody tr');
+  if (dragHoverRowEl && dragHoverRowEl !== target) dragHoverRowEl.classList.remove('row-drop-target');
+  if (!target || target === dragRowEl || target.parentElement !== dragRowEl.parentElement) {
+    dragHoverRowEl = null;
+    return;
+  }
+  dragHoverRowEl = target;
+  dragHoverRowEl.classList.add('row-drop-target');
+  const targetRect = target.getBoundingClientRect();
+  const insertAfter = event.clientY > targetRect.top + (targetRect.height / 2);
+  const parent = target.parentElement;
+  if (insertAfter) parent.insertBefore(dragRowEl, target.nextSibling);
+  else parent.insertBefore(dragRowEl, target);
+}
+
+function endRowHold(event) {
+  clearTimeout(dragHoldTimer);
+  if (dragRowEl && (!event || dragPointerId === event.pointerId)) {
+    saveManualRowOrder();
+    render();
+  }
+  clearDragState();
+}
+
+function render() {
+  orderMode = loadOrderMode();
+  currentData = sortClientsByName(getMonthData(curYear, curMonth));
+  const visibleData = currentData.filter(item => !item.deleted);
+  document.getElementById('month-label').textContent = reiwaLabel(curYear, curMonth);
+  document.getElementById('date-toggle-btn').textContent = allDateReiwa ? '西暦表示' : '和暦表示';
+  const orderBtn = document.getElementById('order-toggle-btn');
+  if (orderBtn) orderBtn.textContent = orderMode === 'custom' ? '名前順' : 'カスタム';
+  const blankBtn = document.querySelector('.top-add-btn.alt');
+  if (blankBtn) blankBtn.classList.toggle('is-placing', blankInsertMode);
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  visibleData.forEach((item, displayIndex) => {
+    const originalIndex = currentData.indexOf(item);
+
+    const tr = document.createElement('tr');
+    tr.dataset.sourceIndex = String(originalIndex);
+    if (CHK.every(key => item[key] === 1)) tr.classList.add('done-row');
+    if (item.rowId && item.rowId === selectedRowId) tr.classList.add('selected-row');
+    if (blankInsertMode && blankInsertIndex === displayIndex) tr.classList.add('blank-insert-target');
+    tr.addEventListener('click', event => {
+      if (event.target.closest('td')) return;
+      if (blankInsertMode) {
+        insertBlankClientRow(displayIndex);
+        return;
+      }
+      selectRow(originalIndex);
+    });
+    tr.addEventListener('mouseenter', () => {
+      if (!blankInsertMode) return;
+      blankInsertIndex = displayIndex;
+      updateBlankInsertHighlight();
+    });
+
+    const tdNo = document.createElement('td');
+    tdNo.className = `td-no${orderMode === 'custom' ? ' is-holdable' : ''}`;
+    tdNo.textContent = item.noNumber ? '' : displayIndex + 1;
+    bindRowSelection(tdNo, originalIndex);
+    tdNo.addEventListener('pointerdown', event => {
+      event.preventDefault();
+      startRowHold(event, originalIndex);
+    });
+    tr.appendChild(tdNo);
+
+    const nameTd = document.createElement('td');
+    nameTd.className = 'td-name';
+    nameTd.innerHTML = `<div class="name-cell">${item.kana ? `<div class="name-kana">${esc(item.kana)}</div>` : ''}<div class="name-main">${esc(item.name)}</div></div>`;
+    bindRowSelection(nameTd, originalIndex);
+    nameTd.addEventListener('dblclick', event => {
+      event.stopPropagation();
+      openNameEditor(originalIndex);
+    });
+    tr.appendChild(nameTd);
+
+    const kosinTd = document.createElement('td');
+    kosinTd.className = 'td-kosin';
+    kosinTd.textContent = item.kosin || '';
+    bindRowSelection(kosinTd, originalIndex);
+    kosinTd.addEventListener('dblclick', event => {
+      event.stopPropagation();
+      openKosin(originalIndex);
+    });
+    tr.appendChild(kosinTd);
+
+    const yukoTd = document.createElement('td');
+    const yukoStatus = getYukoStatus(item.yuko);
+    const yukoStatusClass = yukoStatus === 'done' ? ' expiring-done' : (yukoStatus === 'soon' ? ' expiring' : '');
+    yukoTd.className = `td-date${yukoStatusClass}`;
+    yukoTd.textContent = yukoStatus === 'blank' ? '' : shortDate(item.yuko);
+    bindRowSelection(yukoTd, originalIndex);
+    bindDateCell(yukoTd, () => openPeriodDatePicker(originalIndex, 'yuko', getPeriodFieldLabel('yuko')));
+    tr.appendChild(yukoTd);
+
+    const lvTd = document.createElement('td');
+    lvTd.className = 'td-lv is-clickable';
+    lvTd.textContent = item.level;
+    bindRowSelection(lvTd, originalIndex);
+    lvTd.addEventListener('dblclick', event => {
+      event.stopPropagation();
+      openLevelPicker(originalIndex);
+    });
+    tr.appendChild(lvTd);
+
+    const planLTd = document.createElement('td');
+    planLTd.className = `td-date${yukoStatus === 'done' ? ' expiring-done' : (isCurrentLongPlan(item.planL) ? ' plan-long-current' : '')}`;
+    planLTd.textContent = yukoStatus === 'blank' ? '' : shortDate(item.planL);
+    bindRowSelection(planLTd, originalIndex);
+    bindDateCell(planLTd, () => openPeriodDatePicker(originalIndex, 'planL', getPeriodFieldLabel('planL')));
+    tr.appendChild(planLTd);
+
+    const planSTd = document.createElement('td');
+    planSTd.className = `td-date${yukoStatus === 'done' ? ' expiring-done' : (isCurrentShortPlan(item.planS) ? ' plan-current' : '')}`;
+    planSTd.textContent = yukoStatus === 'blank' ? '' : shortDate(item.planS);
+    bindRowSelection(planSTd, originalIndex);
+    bindDateCell(planSTd, () => openPeriodDatePicker(originalIndex, 'planS', getPeriodFieldLabel('planS')));
+    tr.appendChild(planSTd);
+
+    const visitTd = document.createElement('td');
+    visitTd.className = `td-visit${hasVisitValue(item) ? '' : ' is-empty'}`;
+    bindRowSelection(visitTd, originalIndex);
+    const tags = [item.visitTag1, item.visitTag2].filter(Boolean);
+    const visitCellClass = tags.length === 0 && item.visitDate ? 'visit-cell date-only' : 'visit-cell';
+    visitTd.innerHTML = `
+      <div class="${visitCellClass}">
+        <div class="visit-date-text" data-visit-edit="date">${esc(item.visitDate || '')}</div>
+        <div class="visit-tags" data-visit-edit="tags">${tags.map(tag => `<span class="visit-tag" data-visit-edit="tags">${esc(tag)}</span>`).join('')}</div>
+      </div>`;
+    visitTd.addEventListener('dblclick', event => {
+      event.stopPropagation();
+      openVisit(originalIndex);
+    });
+    visitTd.addEventListener('keydown', event => {
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault();
+        clearVisit(originalIndex);
+      }
+    });
+    tr.appendChild(visitTd);
+
+    CHK.forEach(key => {
+      const td = document.createElement('td');
+      td.className = 'td-cc';
+      td.innerHTML = `<span class="circle ${item[key] === 1 ? 'on' : 'off'}">${item[key] === 1 ? '○' : '○'}</span>`;
+      bindRowSelection(td, originalIndex);
+      td.addEventListener('dblclick', event => {
+        event.stopPropagation();
+        tog(originalIndex, key);
+      });
+      tr.appendChild(td);
+    });
+
+    const meetingTd = document.createElement('td');
+    meetingTd.className = `td-visit${hasMeetingValue(item) ? '' : ' is-empty'}`;
+    bindRowSelection(meetingTd, originalIndex);
+    const meetingTags = [item.meetingTag1, item.meetingTag2].filter(Boolean);
+    const meetingCellClass = meetingTags.length === 0 && item.meetingDate ? 'visit-cell date-only' : 'visit-cell';
+    meetingTd.innerHTML = `
+      <div class="${meetingCellClass}">
+        <div class="visit-date-text">${esc(item.meetingDate || '')}</div>
+        <div class="visit-tags">${meetingTags.map(tag => `<span class="visit-tag">${esc(tag)}</span>`).join('')}</div>
+      </div>`;
+    meetingTd.addEventListener('dblclick', event => {
+      event.stopPropagation();
+      openMeeting(originalIndex);
+    });
+    meetingTd.addEventListener('keydown', event => {
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault();
+        clearMeeting(originalIndex);
+      }
+    });
+    tr.appendChild(meetingTd);
+
+    const sehoTd = document.createElement('td');
+    sehoTd.className = 'td-seho';
+    sehoTd.innerHTML = item.seho || item.sehoCw ? `<div class="seho-cell">${item.seho ? `<span class="seho-dot" title="${esc(item.seho)}"></span>` : '<span style="height:10px"></span>'}${item.sehoCw ? `<span class="seho-label">(${esc(item.sehoCw)})</span>` : ''}</div>` : '';
+    bindRowSelection(sehoTd, originalIndex);
+    sehoTd.addEventListener('dblclick', event => {
+      event.stopPropagation();
+      openSehoEditor(originalIndex);
+    });
+    tr.appendChild(sehoTd);
+
+    const bikoTd = document.createElement('td');
+    bikoTd.className = 'td-biko';
+    bikoTd.textContent = item.biko || '';
+    bindRowSelection(bikoTd, originalIndex);
+    bikoTd.addEventListener('dblclick', event => {
+      event.stopPropagation();
+      openBiko(originalIndex);
+    });
+    tr.appendChild(bikoTd);
+    tbody.appendChild(tr);
+  });
+
+  updateBlankInsertHighlight();
+
+  document.getElementById('s-total').textContent = visibleData.length;
+  document.getElementById('s-notvisited').textContent = visibleData.length - visibleData.filter(item => hasVisitValue(item)).length;
+}
+
+document.addEventListener('pointermove', moveHeldRow, { passive: false });
+document.addEventListener('pointerup', endRowHold);
+document.addEventListener('pointercancel', endRowHold);
+document.getElementById('import-data-input')?.addEventListener('change', event => {
+  importLocalDataFromFile(event.target.files?.[0]);
+});
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+removeUnusedTaskHeaders();
+render();
+</script>
+</body>
+</html>
+
+
+
+
