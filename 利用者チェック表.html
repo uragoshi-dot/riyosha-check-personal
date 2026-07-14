@@ -24,6 +24,18 @@ body {
   display: flex;
   flex-direction: column;
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+input, textarea, select, option {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+.modal-input, .modal-textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 .topbar {
   background: linear-gradient(135deg, #4a9e2f 0%, #65b842 55%, #84cc50 100%);
@@ -61,7 +73,7 @@ body {
   display: flex;
   align-items: center;
   gap: 3px;
-  padding: 3px 7px;
+  padding: 4px 9px;
   border-radius: 20px;
   background: rgba(255,255,255,0.18);
 }
@@ -84,15 +96,74 @@ body {
   font-family: inherit;
   white-space: nowrap;
 }
+.top-add-btn.primary {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(20, 58, 20, 0.18);
+  backdrop-filter: blur(8px);
+  color: #f8fff4;
+  box-shadow: 0 8px 18px rgba(26, 77, 14, 0.16);
+}
+.top-add-btn.primary .top-add-btn-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.top-add-btn.primary .top-add-btn-label::before {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #f4fbef;
+  color: #2d7a1a;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+}
 .top-add-btn.alt {
   background: rgba(255,255,255,0.18);
   color: white;
 }
-.top-add-btn.alt.is-placing {
-  background: #fef3c7;
-  color: #92400e;
-  border-color: #fde68a;
-  box-shadow: 0 0 0 2px rgba(254, 243, 199, 0.28);
+.utility-btn {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 7px;
+  border: 1px solid rgba(255,255,255,0.34);
+  background: rgba(255,255,255,0.10);
+  color: #f7fff3;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.utility-btn.backup {
+  background: rgba(255,255,255,0.16);
+}
+.utility-btn.import {
+  background: rgba(212,240,196,0.18);
+  color: #eefce6;
+}
+.month-side-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-right: 6px;
 }
 .top-toggle-btn {
   height: 28px;
@@ -107,14 +178,52 @@ body {
   font-family: inherit;
   white-space: nowrap;
 }
+.date-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.28);
+}
+.date-toggle-btn {
+  height: 28px;
+  min-width: 48px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.88);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.date-toggle-btn.is-active {
+  background: #f4fbef;
+  color: #2d7a1a;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.date-toggle-btn.order-custom {
+  font-size: 9px;
+  letter-spacing: 0;
+}
 .tbl-wrap {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   background: white;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
-table { border-collapse: collapse; table-layout: fixed; min-width: 1120px; width: 100%; }
+table, thead, tbody, tr, th, td, button, span, div {
+  -webkit-touch-callout: none;
+}
+table { border-collapse: collapse; table-layout: fixed; min-width: 820px; width: 100%; }
 thead th {
   background: #f2fded;
   border-bottom: 2px solid #b3e89a;
@@ -126,29 +235,84 @@ thead th {
   top: 0;
   z-index: 10;
 }
-th.h-no { width: 30px; font-size: 10px; color: #2d7a1a; font-weight: 700; }
-th.h-name { width: 92px; font-size: 10px; color: #2d7a1a; font-weight: 700; text-align: left; padding-left: 8px; }
-th.h-kosin { width: 64px; font-size: 10px; color: #2d7a1a; font-weight: 700; text-align: center; border-right: 2px solid #86d46a; }
-th.h-rot { width: 34px; }
-th.h-rot-date { width: 72px; }
-th.h-visit { width: 40px; }
-th.h-seho { width: 46px; }
-th.h-biko { font-size: 10px; color: #2d7a1a; font-weight: 700; text-align: left; padding-left: 8px; border-left: 2px solid #86d46a; min-width: 92px; }
-th .inner {
-  writing-mode: vertical-lr;
+th.h-no {
+  width: 30px;
   font-size: 10px;
+  color: #2d7a1a;
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0;
+}
+th.h-name {
+  width: 58px;
+  font-size: 10px;
+  color: #2d7a1a;
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0;
+}
+th.h-kosin { width: 40px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; border-right: 2px solid #86d46a; }
+th.h-rot { width: 22px; }
+th[data-col-key="level"] { width: 28px; vertical-align: middle; padding: 0; }
+th.h-rot-date { width: 44px; vertical-align: middle; padding: 0; }
+th.h-visit { width: 26px; }
+th.h-seho { width: 34px; }
+th.h-biko { width: 168px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; padding-left: 0; border-left: 2px solid #86d46a; min-width: 168px; }
+th.col-movable { cursor: pointer; }
+th[data-col-key], td[data-col-key] { transition: background-color 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease; }
+th.col-selected {
+  background: #dff5d2 !important;
+  box-shadow: inset 0 0 0 2px #65b842;
+}
+th.col-dragging {
+  background: #eefce6 !important;
+  box-shadow: 0 8px 20px rgba(58,158,32,0.22), inset 0 0 0 2px #65b842;
+  transform: scale(1.04);
+  z-index: 25;
+}
+th.col-drop-target {
+  background: #fff7d6 !important;
+  box-shadow: inset 3px 0 0 #f59e0b;
+}
+th .inner {
+  writing-mode: horizontal-tb;
+  font-size: 8px;
   font-weight: 700;
   color: #2d7a1a;
-  white-space: nowrap;
-  line-height: 1;
+  white-space: normal;
+  line-height: 1.05;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  text-align: center;
+  padding: 0 2px;
+}
+th .inner.long {
+  font-size: 6.8px;
+  letter-spacing: -0.05em;
+}
+th .inner.split {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 34px;
+  font-size: 6.8px;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+th .inner.split span {
   display: block;
-  padding: 2px 0;
 }
 tbody tr:nth-child(even) { background: #f8fcff; }
 tbody tr:nth-child(odd) { background: white; }
+tbody tr { transition: background-color 0.14s ease, box-shadow 0.18s ease, transform 0.18s ease, opacity 0.18s ease; }
 tbody tr.done-row { background: #f0fdf4 !important; }
-tbody tr.selected-row { background: #d4f0c4 !important; }
-tbody tr.done-row.selected-row { background: #dcfce7 !important; }
 tbody tr.blank-insert-target {
   background: #fff7d6 !important;
   box-shadow: inset 0 3px 0 #f59e0b;
@@ -162,59 +326,52 @@ td {
   font-size: 12px;
   color: #92400e;
 }
-td.td-no { font-size: 11px; color: #86d46a; font-weight: 700; width: 30px; }
-td.td-no.is-holdable { cursor: grab; user-select: none; touch-action: none; }
-td.td-no.is-holdable:active { cursor: grabbing; }
-tr.row-dragging {
-  opacity: 0.88;
-  position: relative;
-  z-index: 3;
-  box-shadow: 0 8px 20px rgba(58,158,32,0.22);
-  transform: scale(1.01);
-}
-tr.row-drop-target {
-  outline: 2px solid #65b842;
-  outline-offset: -2px;
-  background: #eefce6 !important;
-}
-body.drag-sorting { user-select: none; }
+td.td-no { font-size: 10px; color: #86d46a; font-weight: 700; width: 30px; text-align: center; vertical-align: middle; padding: 0; }
+td.td-lv { min-width: 28px; }
 td.td-name {
-  text-align: left;
-  padding: 0 6px;
+  text-align: center;
+  padding: 0;
   color: #1a4d0e;
-  width: 92px;
+  width: 58px;
   cursor: pointer;
   overflow: hidden;
+  vertical-align: middle;
 }
 .name-cell {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   gap: 1px;
   min-height: 40px;
+  width: 100%;
   overflow: hidden;
 }
 .name-kana {
-  font-size: 9px;
+  font-size: 8px;
   line-height: 1.1;
   color: #64748b;
+  text-align: center;
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .name-main {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1.15;
   color: #1a4d0e;
+  text-align: center;
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 td.td-kosin {
-  width: 64px;
-  padding: 0 4px;
-  font-size: 10px;
+  width: 40px;
+  padding: 0 2px;
+  font-size: 9px;
   font-weight: 700;
   color: #92400e;
   white-space: normal;
@@ -222,17 +379,17 @@ td.td-kosin {
   line-height: 1.25;
   border-right: 2px solid #b3e89a;
 }
-td.td-date { font-size: 11px; font-weight: 600; color: #1a4d0e; padding: 0 3px; width: 72px; white-space: nowrap; }
+td.td-date { font-size: 9px; font-weight: 600; color: #1a4d0e; padding: 0 1px; width: 44px; white-space: nowrap; }
 td.td-date.expiring { color: #dc2626; font-weight: 700; }
 td.td-date.expiring-done { color: #b8c0b3; font-weight: 600; }
 td.td-date.plan-long-current { color: #dc2626; font-weight: 700; }
 td.td-date.plan-current { color: #dc2626; font-weight: 700; }
-td.td-lv { font-size: 13px; font-weight: 700; color: #2d7a1a; width: 36px; }
+td.td-lv { font-size: 11px; font-weight: 700; color: #2d7a1a; width: 28px; }
 td.td-lv.is-clickable { cursor: pointer; }
 td.td-visit {
-  width: 68px;
+  width: 44px;
   outline: none;
-  padding: 3px 3px 4px;
+  padding: 2px 1px 3px;
   cursor: pointer;
 }
 td.td-visit.is-empty { color: #cbd5e1; }
@@ -245,8 +402,8 @@ td.td-visit.is-selected {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 3px;
-  min-height: 40px;
+  gap: 2px;
+  min-height: 34px;
   height: 100%;
 }
 .visit-cell.date-only {
@@ -254,7 +411,7 @@ td.td-visit.is-selected {
   gap: 0;
 }
 .visit-date-text {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
   color: #3a9e20;
   line-height: 1.1;
@@ -265,7 +422,7 @@ td.td-visit.is-selected {
   width: 100%;
 }
 .visit-cell.date-only .visit-date-text {
-  font-size: 13px;
+  font-size: 10px;
   line-height: 1.2;
   min-height: 0;
 }
@@ -282,7 +439,7 @@ td.td-visit.is-selected {
   display: none;
 }
 .visit-tag {
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 700;
   line-height: 1;
   padding: 2px 4px;
@@ -293,8 +450,10 @@ td.td-visit.is-selected {
 td.td-cc { cursor: pointer; width: 34px; user-select: none; }
 td.td-seho { width: 46px; cursor: pointer; padding: 2px 2px; }
 td.td-biko {
-  text-align: left;
-  padding: 0 8px;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+  padding: 0;
   font-size: 11px;
   color: #64748b;
   white-space: nowrap;
@@ -627,6 +786,26 @@ td.td-biko {
     padding: 6px;
   }
 }
+@media (max-width: 1024px) {
+  table { min-width: 800px; }
+  th.h-no { width: 28px; }
+  th.h-name { width: 54px; padding-left: 0; }
+  th.h-kosin { width: 36px; }
+  th.h-rot { width: 20px; }
+  th.h-rot-date { width: 40px; }
+  th.h-visit { width: 24px; }
+  th.h-seho { width: 32px; }
+  th[data-col-key="level"] { width: 26px; }
+  th.h-biko { min-width: 150px; width: 150px; padding-left: 0; }
+  td.td-no { width: 28px; }
+  td.td-name { width: 54px; padding: 0; }
+  td.td-kosin { width: 36px; font-size: 8px; }
+  td.td-lv { min-width: 26px; }
+  td.td-biko { min-width: 150px; padding: 0; font-size: 9px; }
+  .circle { width: 22px; height: 22px; font-size: 11px; }
+  .name-kana { font-size: 7px; }
+  .name-main { font-size: 10px; }
+}
 .modal {
   background: white;
   border-radius: 20px 20px 0 0;
@@ -731,15 +910,21 @@ input.modal-input { margin-bottom: 8px; }
   <div class="app-name">利用者チェック表</div>
   <div class="stats">
     <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-label">総数</div></div>
-    <div class="stat"><div class="stat-num r" id="s-notvisited">0</div><div class="stat-label">未訪問</div></div>
-    <button class="top-add-btn" onclick="openAddClient()">利用者追加</button>
-    <button class="top-add-btn alt" onclick="exportLocalData()">書出</button>
-    <button class="top-add-btn alt" onclick="triggerImportLocalData()">読込</button>
-    <button class="top-toggle-btn" id="date-toggle-btn" onclick="toggleAllDateMode()">西暦表示</button>
-    <button class="top-toggle-btn" id="order-toggle-btn" onclick="toggleOrderMode()">名前順</button>
-    <button class="top-add-btn alt" onclick="addBlankClientRow()">空欄追加</button>
+    <button class="top-add-btn primary" onclick="openAddClient()"><span class="top-add-btn-label">利用者追加</span></button>
+    <div class="date-toggle-group" aria-label="日付表示切替">
+      <button class="date-toggle-btn" id="date-toggle-wareki" onclick="setDateDisplayMode(true)">和暦</button>
+      <button class="date-toggle-btn" id="date-toggle-seireki" onclick="setDateDisplayMode(false)">西暦</button>
+    </div>
+    <div class="date-toggle-group" aria-label="並び順切替">
+      <button class="date-toggle-btn" id="order-toggle-name" onclick="setOrderMode('name')">名前順</button>
+      <button class="date-toggle-btn order-custom" id="order-toggle-custom" onclick="setOrderMode('custom')">カスタム順</button>
+    </div>
   </div>
   <div class="month-nav">
+    <div class="month-side-actions">
+      <button class="utility-btn backup" onclick="exportLocalData()">バックアップ</button>
+      <button class="utility-btn import" onclick="triggerImportLocalData()">データ挿入</button>
+    </div>
     <button class="mbtn" onclick="changeMonth(-1)">‹</button>
     <span class="mlabel" id="month-label"></span>
     <button class="mbtn" onclick="changeMonth(1)">›</button>
@@ -752,22 +937,22 @@ input.modal-input { margin-bottom: 8px; }
       <tr>
         <th class="h-no">No</th>
         <th class="h-name">利用者名</th>
-        <th class="h-kosin">更新申請他</th>
-        <th class="h-rot h-rot-date" id="th-yuko"><span class="inner">有効期間</span></th>
-        <th class="h-rot"><span class="inner">介護度</span></th>
-        <th class="h-rot h-rot-date" id="th-planL"><span class="inner">長期</span></th>
-        <th class="h-rot h-rot-date" id="th-planS"><span class="inner">短期</span></th>
-        <th class="h-rot h-visit"><span class="inner">訪問日</span></th>
-        <th class="h-rot"><span class="inner">モニ記録</span></th>
-        <th class="h-rot"><span class="inner">支援経過</span></th>
-        <th class="h-rot"><span class="inner">利用票ドライブ</span></th>
-        <th class="h-rot"><span class="inner">次月利用票</span></th>
-        <th class="h-rot"><span class="inner">次月提供票</span></th>
+        <th class="h-kosin">更新申請等<br>（メモ）</th>
+        <th class="h-rot h-rot-date col-movable" data-col-key="yuko"><span class="inner">有効期間</span></th>
+        <th class="h-rot col-movable" data-col-key="level"><span class="inner">介護度</span></th>
+        <th class="h-rot h-rot-date col-movable" data-col-key="planL"><span class="inner">長期</span></th>
+        <th class="h-rot h-rot-date col-movable" data-col-key="planS"><span class="inner">短期</span></th>
+        <th class="h-rot h-visit col-movable" data-col-key="visit"><span class="inner">訪問日</span></th>
+        <th class="h-rot col-movable" data-col-key="monita"><span class="inner">モニ記録</span></th>
+        <th class="h-rot col-movable" data-col-key="sikien"><span class="inner">支援経過</span></th>
+        <th class="h-rot col-movable" data-col-key="drive"><span class="inner split"><span>利用票</span><span>ドライブ</span></span></th>
+        <th class="h-rot col-movable" data-col-key="hand"><span class="inner split"><span>次月</span><span>利用票</span></span></th>
+        <th class="h-rot col-movable" data-col-key="fax"><span class="inner split"><span>次月</span><span>提供票</span></span></th>
         <th class="h-rot"><span class="inner">プラン作成</span></th>
-        <th class="h-rot"><span class="inner">担当者会議</span></th>
+        <th class="h-rot col-movable" data-col-key="meeting"><span class="inner split"><span>担当者</span><span>会議</span></span></th>
         <th class="h-rot"><span class="inner">照会</span></th>
         <th class="h-rot"><span class="inner">アセス</span></th>
-        <th class="h-rot h-seho"><span class="inner">生保</span></th>
+        <th class="h-rot h-seho col-movable" data-col-key="seho"><span class="inner">生保</span></th>
         <th class="h-biko">備考</th>
       </tr>
     </thead>
@@ -775,7 +960,7 @@ input.modal-input { margin-bottom: 8px; }
   </table>
 </div>
 
-<div class="modal-bg" id="modal" onclick="if(event.target===this) closeModal()">
+<div class="modal-bg" id="modal">
   <div class="modal">
     <div class="modal-pill"></div>
     <div class="modal-col" id="mc"></div>
@@ -890,20 +1075,17 @@ function hasMeetingValue(item) {
 const STORAGE_KEY = 'riyosha_check_v1';
 const FAC_KEY = 'riyosha_facilities_v1';
 const ORDER_MODE_KEY = 'riyosha_order_mode_v1';
+const COLUMN_ORDER_KEY = 'riyosha_column_order_v1';
 const CHK = ['monita', 'sikien', 'drive', 'hand', 'fax'];
+const MOVABLE_COLUMN_KEYS = ['yuko', 'level', 'planL', 'planS', 'visit', 'monita', 'sikien', 'drive', 'hand', 'fax', 'meeting', 'seho'];
 const nameCollator = new Intl.Collator('ja', { sensitivity: 'base', numeric: true });
 const NAME_YOMI = {};
 const EXPORT_SCHEMA_VERSION = 1;
 let allDateReiwa = true;
 const visitChoices = ['TEL', '蜈･髯｢荳ｭ'];
-const levelChoices = ['謾ｯ1', '謾ｯ2', '1', '2', '3', '4', '5'];
+const levelChoices = ['支1', '支2', '1', '2', '3', '4', '5'];
 
 let currentData = [];
-let dragSrcIdx = null;
-let dragPointerId = null;
-let dragHoldTimer = null;
-let dragRowEl = null;
-let dragHoverRowEl = null;
 let modalIndex = -1;
 let visitPickerYear = 0;
 let visitPickerMonth = 0;
@@ -911,9 +1093,18 @@ let datePickerField = '';
 let pendingDateClick = null;
 let pendingVisitClick = null;
 let orderMode = 'name';
-let selectedRowId = '';
-let blankInsertMode = false;
-let blankInsertIndex = -1;
+let addClientDraft = null;
+let columnOrder = [...MOVABLE_COLUMN_KEYS];
+let selectedColumnKey = '';
+let columnDragPointerId = null;
+let columnDragHoldTimer = null;
+let columnDragActive = false;
+let columnDragKey = '';
+let columnDragHeaderEl = null;
+let columnDragTargetKey = '';
+let columnDragTargetAfter = false;
+let columnDragStartX = 0;
+let columnDragPointerOffsetX = 0;
 
 function removeUnusedTaskHeaders() {
   const headerRow = document.querySelector('thead tr');
@@ -940,6 +1131,22 @@ function loadOrderMode() {
   } catch {
     return 'name';
   }
+}
+
+function loadColumnOrder() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(COLUMN_ORDER_KEY) || '[]');
+    if (!Array.isArray(saved)) return [...MOVABLE_COLUMN_KEYS];
+    const valid = saved.filter(key => MOVABLE_COLUMN_KEYS.includes(key));
+    const missing = MOVABLE_COLUMN_KEYS.filter(key => !valid.includes(key));
+    return [...valid, ...missing];
+  } catch {
+    return [...MOVABLE_COLUMN_KEYS];
+  }
+}
+
+function saveColumnOrder() {
+  localStorage.setItem(COLUMN_ORDER_KEY, JSON.stringify(columnOrder));
 }
 
 function saveOrderMode(mode) {
@@ -1004,6 +1211,104 @@ function fillKanaIfKnown(nameInputId, kanaInputId) {
   if (!nameInput || !kanaInput) return;
   const autoKana = resolveKanaForName(nameInput.value);
   if (autoKana) kanaInput.value = autoKana;
+}
+
+function defaultAddClientDraft() {
+  return {
+    name: '',
+    kana: '',
+    yuko: '',
+    level: '',
+    planL: '',
+    planS: '',
+    seho: '',
+    sehoCw: ''
+  };
+}
+
+function syncAddClientDraft() {
+  if (!addClientDraft) addClientDraft = defaultAddClientDraft();
+  const read = id => (document.getElementById(id)?.value || '').trim();
+  addClientDraft.name = read('add-name');
+  addClientDraft.kana = read('add-kana');
+}
+
+function renderAddClientModal() {
+  if (!addClientDraft) addClientDraft = defaultAddClientDraft();
+  modalIndex = -1;
+  showModal('利用者を追加', '新規',
+    `<input class="modal-input" id="add-name" placeholder="利用者名" value="${esc(addClientDraft.name || '')}" oninput="fillKanaIfKnown('add-name','add-kana')" onchange="fillKanaIfKnown('add-name','add-kana')" onblur="fillKanaIfKnown('add-name','add-kana')">
+     <input class="modal-input" id="add-kana" placeholder="かな" value="${esc(addClientDraft.kana || '')}">
+     <input class="modal-input" id="add-yuko" placeholder="有効期限 例: R9.10.31" value="${esc(shortDate(addClientDraft.yuko) || '')}" readonly ondblclick="syncAddClientDraft();openAddClientPeriodPicker('yuko')" onclick="this.blur()">
+     <input class="modal-input" id="add-level" placeholder="介護度" value="${esc(addClientDraft.level || '')}" readonly ondblclick="syncAddClientDraft();openAddClientLevelPicker()" onclick="this.blur()">
+     <input class="modal-input" id="add-planL" placeholder="長期 例: R9.10.31" value="${esc(shortDate(addClientDraft.planL) || '')}" readonly ondblclick="syncAddClientDraft();openAddClientPeriodPicker('planL')" onclick="this.blur()">
+     <input class="modal-input" id="add-planS" placeholder="短期 例: R9.4.30" value="${esc(shortDate(addClientDraft.planS) || '')}" readonly ondblclick="syncAddClientDraft();openAddClientPeriodPicker('planS')" onclick="this.blur()">
+     <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #b3e89a;border-radius:10px;background:#f9fef5;margin-top:2px;cursor:pointer">
+       <input type="checkbox" id="add-seho-mark" ${addClientDraft.seho ? 'checked' : ''} onchange="syncAddClientSehoDraft()" style="width:18px;height:18px;accent-color:#65b842">
+       <span style="font-size:13px;font-weight:700;color:#1a4d0e">生活保護あり</span>
+     </label>
+     <input class="modal-input" id="add-seho-cw" placeholder="保護 例: 山田CW" value="${esc(addClientDraft.sehoCw || '')}" oninput="syncAddClientSehoDraft()">
+     <button class="mact green" style="width:100%;margin-top:4px" onclick="addClient()">追加する</button>`
+  );
+  document.getElementById('modal').classList.add('add-client');
+  setTimeout(() => {
+    const input = document.getElementById('add-name');
+    if (input) input.focus();
+    wireKanaAutoTransfer('add-name', 'add-kana');
+  }, 100);
+}
+
+function syncAddClientSehoDraft() {
+  if (!addClientDraft) addClientDraft = defaultAddClientDraft();
+  addClientDraft.seho = document.getElementById('add-seho-mark')?.checked ? '○' : '';
+  addClientDraft.sehoCw = (document.getElementById('add-seho-cw')?.value || '').trim();
+}
+
+function wireKanaAutoTransfer(nameInputId, kanaInputId) {
+  const nameInput = document.getElementById(nameInputId);
+  const kanaInput = document.getElementById(kanaInputId);
+  if (!nameInput || !kanaInput || nameInput.dataset.kanaWired === '1') return;
+
+  let kanaTouched = false;
+  const toKanaCandidate = value => {
+    const text = String(value || '').trim();
+    if (!text) return '';
+    return /^[ぁ-んァ-ヶー\s　]+$/.test(text) ? text : '';
+  };
+  const updateKana = value => {
+    if (kanaTouched) return;
+    const text = toKanaCandidate(value);
+    if (!text) return;
+    kanaInput.value = text;
+  };
+
+  kanaInput.addEventListener('input', () => {
+    kanaTouched = true;
+  });
+
+  nameInput.addEventListener('compositionupdate', event => {
+    updateKana(event.data || '');
+  });
+
+  nameInput.addEventListener('compositionend', event => {
+    const knownKana = resolveKanaForName(nameInput.value);
+    if (knownKana) {
+      updateKana(knownKana);
+      return;
+    }
+    updateKana(toKanaCandidate(event.data || ''));
+  });
+
+  nameInput.addEventListener('input', () => {
+    const knownKana = resolveKanaForName(nameInput.value);
+    if (knownKana) {
+      updateKana(knownKana);
+      return;
+    }
+    updateKana(toKanaCandidate(nameInput.value));
+  });
+
+  nameInput.dataset.kanaWired = '1';
 }
 
 function dedupeClients(data) {
@@ -1153,14 +1458,36 @@ function buildExportPayload() {
   };
 }
 
-function exportLocalData() {
+async function exportLocalData() {
   const payload = buildExportPayload();
+  const text = JSON.stringify(payload, null, 2);
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const stamp = new Date().toISOString().slice(0, 10);
+  const filename = `利用者チェック表_個人データ_${stamp}.json`;
+
+  if (typeof window.showSaveFilePicker === 'function') {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        startIn: 'desktop',
+        types: [{
+          description: 'JSON files',
+          accept: { 'application/json': ['.json'] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(text);
+      await writable.close();
+      return;
+    } catch (error) {
+      if (error && error.name === 'AbortError') return;
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
   a.href = url;
-  a.download = `利用者チェック表_個人データ_${stamp}.json`;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -1310,13 +1637,13 @@ function changeMonth(dir) {
   render();
 }
 
-function toggleAllDateMode() {
-  allDateReiwa = !allDateReiwa;
+function setDateDisplayMode(useWareki) {
+  allDateReiwa = !!useWareki;
   render();
 }
 
-function toggleOrderMode() {
-  saveOrderMode(orderMode === 'custom' ? 'name' : 'custom');
+function setOrderMode(mode) {
+  saveOrderMode(mode === 'custom' ? 'custom' : 'name');
   render();
 }
 
@@ -1496,6 +1823,10 @@ function changeVisitMonth(dir) {
     visitPickerMonth = 12;
     visitPickerYear -= 1;
   }
+  if (addClientDraft && datePickerField && modalIndex < 0) {
+    renderAddClientCalendar();
+    return;
+  }
   renderVisitCalendar();
 }
 
@@ -1505,6 +1836,10 @@ function jumpVisitCalendar() {
   if (!year || !month) return;
   visitPickerYear = parseInt(year.value, 10);
   visitPickerMonth = parseInt(month.value, 10);
+  if (addClientDraft && datePickerField && modalIndex < 0) {
+    renderAddClientCalendar();
+    return;
+  }
   renderVisitCalendar();
 }
 
@@ -1687,7 +2022,7 @@ function openBiko(i) {
 function openKosin(i) {
   modalIndex = i;
   document.getElementById('modal').classList.add('compact-picker');
-  showModal('更新申請他', currentData[i].name,
+  showModal('更新申請等（メモ）', currentData[i].name,
     `<input class="modal-input" id="kosin-input" placeholder="例: 7/1更新" value="${esc(currentData[i].kosin || '')}">
      <button class="mact green" style="width:100%;margin-top:8px" onclick="saveKosin()">保存する</button>`
   );
@@ -1811,80 +2146,156 @@ function saveVisitTextEditor() {
 }
 
 function openAddClient() {
-  showModal('利用者を追加', '新規',
-    `<input class="modal-input" id="add-name" placeholder="利用者名" oninput="fillKanaIfKnown('add-name','add-kana')" onchange="fillKanaIfKnown('add-name','add-kana')" onblur="fillKanaIfKnown('add-name','add-kana')">
-     <input class="modal-input" id="add-kana" placeholder="かな">
-     <input class="modal-input" id="add-yuko" placeholder="有効期限 例: R9.10.31">
-     <input class="modal-input" id="add-level" placeholder="介護度 例: 2">
-     <input class="modal-input" id="add-planL" placeholder="プラン長期 例: R9.10.31">
-     <input class="modal-input" id="add-planS" placeholder="プラン短期 例: R9.4.30">
-     <input class="modal-input" id="add-seho-cw" placeholder="保護 例: 山田CW">
-     <button class="mact green" style="width:100%;margin-top:4px" onclick="addClient()">追加する</button>`
-  );
-  document.getElementById('modal').classList.add('add-client');
-  setTimeout(() => {
-    const input = document.getElementById('add-name');
-    if (input) input.focus();
-  }, 100);
+  addClientDraft = defaultAddClientDraft();
+  renderAddClientModal();
 }
 
 function addClient() {
-  const get = id => (document.getElementById(id)?.value || '').trim();
-  const name = get('add-name');
-  if (!name) {
-    alert('利用者名を入力してください');
-    return;
-  }
-  if (currentData.some(item => !item.deleted && String(item.name || '').trim() === name)) {
+  syncAddClientDraft();
+  syncAddClientSehoDraft();
+  const name = String(addClientDraft?.name || '').trim();
+  if (name && currentData.some(item => !item.deleted && String(item.name || '').trim() === name)) {
     alert('同じ利用者名があります。追加せず既存データを確認してください');
     return;
   }
   currentData.push(newClientData({
     name,
-    kana: get('add-kana') || resolveKanaForName(name),
+    kana: String(addClientDraft?.kana || '').trim() || resolveKanaForName(name),
     customAdded: true,
-    yuko: get('add-yuko'),
-    level: get('add-level'),
-    planL: get('add-planL'),
-    planS: get('add-planS'),
-    seho: get('add-seho-cw') ? '○' : '',
-    sehoCw: get('add-seho-cw')
+    noNumber: !name,
+    baseName: '',
+    yuko: addClientDraft?.yuko || '',
+    level: addClientDraft?.level || '',
+    planL: addClientDraft?.planL || '',
+    planS: addClientDraft?.planS || '',
+    seho: addClientDraft?.seho || '',
+    sehoCw: addClientDraft?.sehoCw || ''
   }));
+  addClientDraft = null;
   saveMonthData(curYear, curMonth, currentData);
   closeModal();
   render();
 }
 
-function addBlankClientRow() {
-  blankInsertMode = !blankInsertMode;
-  const visibleData = currentData.filter(item => !item.deleted);
-  blankInsertIndex = blankInsertMode ? visibleData.length : -1;
-  render();
+function openAddClientPeriodPicker(field) {
+  if (!addClientDraft) addClientDraft = defaultAddClientDraft();
+  modalIndex = -1;
+  const modal = document.getElementById('modal');
+  modal.classList.add('calendar-picker');
+  const parsed = parseAnyDate(addClientDraft[field]) || { year: curYear, month: curMonth, day: null };
+  visitPickerYear = parsed.year;
+  visitPickerMonth = parsed.month;
+  datePickerField = field;
+  showModal(getPeriodFieldLabel(field), '新規',
+    `<div class="calendar-box">
+      <div class="calendar-head">
+        <button class="calendar-nav" onclick="changeVisitMonth(-1)">‹</button>
+        <div class="calendar-selects">
+          <select class="calendar-select" id="visit-calendar-year" onchange="jumpVisitCalendar()"></select>
+          <select class="calendar-select" id="visit-calendar-month" onchange="jumpVisitCalendar()"></select>
+        </div>
+        <button class="calendar-nav" onclick="changeVisitMonth(1)">›</button>
+      </div>
+      <div class="calendar-weekdays">
+        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+      <div class="calendar-grid" id="visit-calendar-grid"></div>
+      <div class="visit-modal-actions">
+        <button class="mact red" onclick="clearAddClientDateField('${field}')">クリア</button>
+        <button class="mact green" onclick="renderAddClientModal()">OK</button>
+      </div>
+    </div>`
+  );
+  renderAddClientCalendar();
 }
 
-function insertBlankClientRow(insertIndex = blankInsertIndex) {
-  const visibleData = currentData.filter(item => !item.deleted);
-  const safeInsertIndex = Math.max(0, Math.min(visibleData.length, insertIndex));
-  const blankItem = newClientData({
-    name: '',
-    kana: '',
-    customAdded: true,
-    noNumber: true,
-    baseName: ''
-  });
-  const orderedVisible = [...visibleData];
-  orderedVisible.splice(safeInsertIndex, 0, blankItem);
-  orderedVisible.forEach((item, index) => {
-    item.manualOrder = index;
-  });
-  const hiddenData = currentData.filter(item => item.deleted).map(item => ({ ...item }));
-  currentData = [...orderedVisible, ...hiddenData];
-  blankInsertMode = false;
-  blankInsertIndex = -1;
-  selectedRowId = blankItem.rowId;
-  saveOrderMode('custom');
-  saveMonthData(curYear, curMonth, currentData);
-  render();
+function renderAddClientCalendar() {
+  const yearSelect = document.getElementById('visit-calendar-year');
+  const monthSelect = document.getElementById('visit-calendar-month');
+  const grid = document.getElementById('visit-calendar-grid');
+  if (!yearSelect || !monthSelect || !grid || !addClientDraft) return;
+  renderCalendarSelects(yearSelect, monthSelect, visitPickerYear, visitPickerMonth);
+  grid.innerHTML = '';
+  const parsed = parseAnyDate(addClientDraft[datePickerField]);
+  const selectedDay = parsed && parsed.year === visitPickerYear && parsed.month === visitPickerMonth ? parsed.day : null;
+  const firstWeekday = new Date(visitPickerYear, visitPickerMonth - 1, 1).getDay();
+  const daysInMonth = new Date(visitPickerYear, visitPickerMonth, 0).getDate();
+  for (let i = 0; i < firstWeekday; i += 1) {
+    const blank = document.createElement('button');
+    blank.className = 'calendar-day blank';
+    blank.disabled = true;
+    blank.textContent = '';
+    grid.appendChild(blank);
+  }
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const btn = document.createElement('button');
+    btn.className = `calendar-day${selectedDay === day ? ' sel' : ''}`;
+    btn.textContent = String(day);
+    btn.onclick = () => {
+      if (!addClientDraft) return;
+      addClientDraft[datePickerField] = selectedDay === day ? '' : formatWareki(visitPickerYear, visitPickerMonth, day);
+      openAddClientPeriodPicker(datePickerField);
+    };
+    grid.appendChild(btn);
+  }
+}
+
+function clearAddClientDateField(field) {
+  if (!addClientDraft) return;
+  addClientDraft[field] = '';
+  openAddClientPeriodPicker(field);
+}
+
+function openAddClientLevelPicker() {
+  if (!addClientDraft) addClientDraft = defaultAddClientDraft();
+  modalIndex = -1;
+  const current = String(addClientDraft.level || '');
+  const modal = document.getElementById('modal');
+  modal.classList.add('compact-picker');
+  showModal('介護度', '新規',
+    `<div style="display:flex;gap:6px;flex-wrap:wrap;">
+      ${levelChoices.map(level => `<button class="mact${current === level ? ' sel' : ''}" style="flex:none;min-width:40px;padding:8px 6px" onclick="setAddClientLevel('${level}')">${level}</button>`).join('')}
+    </div>`
+  );
+}
+
+function setAddClientLevel(value) {
+  if (!addClientDraft) addClientDraft = defaultAddClientDraft();
+  addClientDraft.level = value;
+  renderAddClientModal();
+}
+
+function openAddClientSehoEditor() {
+  if (!addClientDraft) addClientDraft = defaultAddClientDraft();
+  modalIndex = -1;
+  showModal('保護', '新規',
+    `<label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #b3e89a;border-radius:10px;background:#f9fef5;margin-bottom:8px;cursor:pointer">
+       <input type="checkbox" id="seho-mark-input" ${addClientDraft.seho ? 'checked' : ''} style="width:18px;height:18px;accent-color:#65b842">
+       <span style="font-size:13px;font-weight:700;color:#1a4d0e">生活保護あり</span>
+     </label>
+     <input class="modal-input" id="seho-cw-input" placeholder="下段 例: 山田CW" value="${esc(addClientDraft.sehoCw || '')}">
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveAddClientSehoEditor()">保存する</button>
+     <button class="mact red" style="width:100%;margin-top:8px" onclick="clearAddClientSehoEditor()">クリア</button>`
+  );
+  document.getElementById('modal').classList.add('compact-picker');
+  setTimeout(() => {
+    const input = document.getElementById('seho-cw-input');
+    if (input) input.focus();
+  }, 100);
+}
+
+function saveAddClientSehoEditor() {
+  if (!addClientDraft) addClientDraft = defaultAddClientDraft();
+  addClientDraft.seho = document.getElementById('seho-mark-input')?.checked ? '○' : '';
+  addClientDraft.sehoCw = (document.getElementById('seho-cw-input')?.value || '').trim();
+  renderAddClientModal();
+}
+
+function clearAddClientSehoEditor() {
+  if (!addClientDraft) return;
+  addClientDraft.seho = '';
+  addClientDraft.sehoCw = '';
+  renderAddClientModal();
 }
 
 function openAddFacility() {
@@ -1936,37 +2347,11 @@ function openNameEditor(i) {
   setTimeout(() => {
     const input = document.getElementById('edit-name-input');
     if (input) input.focus();
+    wireKanaAutoTransfer('edit-name-input', 'edit-kana-input');
   }, 100);
 }
 
-function selectRow(i) {
-  const rowId = currentData[i]?.rowId || '';
-  selectedRowId = selectedRowId === rowId ? '' : rowId;
-  render();
-}
-
 function bindRowSelection(cell, i) {
-  cell.addEventListener('click', event => {
-    if (dragRowEl) return;
-    if (blankInsertMode) {
-      event.stopPropagation();
-      insertBlankClientRow(i);
-      return;
-    }
-    event.stopPropagation();
-    selectRow(i);
-  });
-}
-
-function updateBlankInsertHighlight() {
-  const rows = Array.from(document.querySelectorAll('#tbody tr'));
-  rows.forEach((row, index) => {
-    row.classList.toggle('blank-insert-target', blankInsertMode && blankInsertIndex === index);
-  });
-  if (blankInsertMode && blankInsertIndex >= rows.length) {
-    const lastRow = rows[rows.length - 1];
-    if (lastRow) lastRow.classList.add('blank-insert-target');
-  }
 }
 
 function saveNameEditor() {
@@ -2048,94 +2433,212 @@ function closeConfirm() {
   document.getElementById('confirm').classList.remove('show');
 }
 
-function clearDragState() {
-  clearTimeout(dragHoldTimer);
-  dragHoldTimer = null;
-  dragPointerId = null;
-  dragSrcIdx = null;
-  if (dragRowEl) dragRowEl.classList.remove('row-dragging');
-  if (dragHoverRowEl) dragHoverRowEl.classList.remove('row-drop-target');
-  dragRowEl = null;
-  dragHoverRowEl = null;
-  document.body.classList.remove('drag-sorting');
-}
-
-function saveManualRowOrder() {
-  const rows = Array.from(document.querySelectorAll('#tbody tr'));
-  const ordered = [];
-  rows.forEach((row, index) => {
-    const sourceIndex = parseInt(row.dataset.sourceIndex || '-1', 10);
-    if (sourceIndex < 0 || !currentData[sourceIndex]) return;
-    ordered.push({ ...currentData[sourceIndex], manualOrder: index });
+function renderColumnHeaderOrder() {
+  const headerRow = document.querySelector('thead tr');
+  if (!headerRow) return;
+  const fixedStart = Array.from(headerRow.querySelectorAll('th')).slice(0, 3);
+  const fixedEnd = headerRow.querySelector('th.h-biko');
+  const movableMap = new Map(
+    Array.from(headerRow.querySelectorAll('th[data-col-key]')).map(th => [th.dataset.colKey, th])
+  );
+  columnOrder.forEach(key => {
+    const th = movableMap.get(key);
+    if (th) headerRow.insertBefore(th, fixedEnd);
   });
-  if (ordered.length === currentData.length) {
-    currentData = ordered;
-    saveMonthData(curYear, curMonth, currentData);
-  }
+  fixedStart.forEach((th, index) => {
+    const anchor = headerRow.children[index];
+    if (anchor !== th) headerRow.insertBefore(th, anchor || headerRow.firstChild);
+  });
+  Array.from(headerRow.querySelectorAll('th[data-col-key]')).forEach(th => {
+    th.classList.toggle('col-selected', th.dataset.colKey === selectedColumnKey);
+  });
 }
 
-function startRowHold(event, sourceIndex) {
-  if (orderMode !== 'custom') return;
-  if (event.pointerType === 'mouse' && event.button !== 0) return;
-  const rowId = currentData[sourceIndex]?.rowId || '';
-  if (!rowId || selectedRowId !== rowId) return;
-  clearTimeout(dragHoldTimer);
-  dragPointerId = event.pointerId;
-  dragSrcIdx = sourceIndex;
-  const cell = event.currentTarget;
-  if (cell.setPointerCapture) cell.setPointerCapture(event.pointerId);
+function moveColumnKeyInOrder(sourceKey, targetKey, insertAfter) {
+  if (!sourceKey || !targetKey || sourceKey === targetKey) return false;
+  const nextOrder = columnOrder.filter(key => key !== sourceKey);
+  const baseIndex = nextOrder.indexOf(targetKey);
+  if (baseIndex < 0) return false;
+  const insertIndex = insertAfter ? baseIndex + 1 : baseIndex;
+  nextOrder.splice(insertIndex, 0, sourceKey);
+  if (nextOrder.join('|') === columnOrder.join('|')) return false;
+  columnOrder = nextOrder;
+  return true;
+}
+
+function reorderColumnDom(sourceKey, targetKey, insertAfter) {
+  if (!moveColumnKeyInOrder(sourceKey, targetKey, insertAfter)) return false;
+  const headerRow = document.querySelector('thead tr');
+  const bodyRows = Array.from(document.querySelectorAll('#tbody tr'));
+  const headerSource = headerRow?.querySelector(`th[data-col-key="${sourceKey}"]`);
+  const headerTarget = headerRow?.querySelector(`th[data-col-key="${targetKey}"]`);
+  if (headerRow && headerSource && headerTarget) {
+    headerRow.insertBefore(headerSource, insertAfter ? headerTarget.nextSibling : headerTarget);
+  }
+  bodyRows.forEach(row => {
+    const sourceCell = row.querySelector(`td[data-col-key="${sourceKey}"]`);
+    const targetCell = row.querySelector(`td[data-col-key="${targetKey}"]`);
+    if (!sourceCell || !targetCell) return;
+    row.insertBefore(sourceCell, insertAfter ? targetCell.nextSibling : targetCell);
+  });
+  renderColumnHeaderOrder();
+  return true;
+}
+
+function bindMovableColumnHeaders() {
+  document.querySelectorAll('th[data-col-key]').forEach(th => {
+    if (th.dataset.bound === '1') return;
+    th.dataset.bound = '1';
+    th.addEventListener('dblclick', event => {
+      event.stopPropagation();
+      const key = th.dataset.colKey || '';
+      selectedColumnKey = selectedColumnKey === key ? '' : key;
+      renderColumnHeaderOrder();
+    });
+    th.addEventListener('pointerdown', event => {
+      const key = th.dataset.colKey || '';
+      if (!selectedColumnKey || selectedColumnKey !== key) return;
+      event.preventDefault();
+      startColumnHold(event, key, th);
+    });
+  });
+}
+
+function startColumnHold(event, key, th) {
+  clearTimeout(columnDragHoldTimer);
+  columnDragPointerId = event.pointerId;
+  columnDragKey = key;
+  columnDragHeaderEl = th;
+  columnDragTargetKey = '';
+  columnDragTargetAfter = false;
+  columnDragStartX = event.clientX;
+  const rect = th.getBoundingClientRect();
+  columnDragPointerOffsetX = event.clientX - rect.left;
   const activateDrag = () => {
-    const row = cell.closest('tr');
-    if (!row) return;
-    dragRowEl = row;
-    dragRowEl.classList.add('row-dragging');
-    document.body.classList.add('drag-sorting');
+    columnDragActive = true;
+    if (columnDragHeaderEl) columnDragHeaderEl.classList.add('col-dragging');
   };
-  if (event.pointerType === 'mouse') {
-    activateDrag();
-    return;
-  }
-  dragHoldTimer = setTimeout(activateDrag, 450);
+  columnDragHoldTimer = setTimeout(activateDrag, 260);
 }
 
-function moveHeldRow(event) {
-  if (!dragRowEl || dragPointerId !== event.pointerId) return;
+function updateColumnDropMarker(targetKey, insertAfter) {
+  document.querySelectorAll('th[data-col-key]').forEach(th => th.classList.remove('col-drop-target'));
+  const markerKey = insertAfter
+    ? columnOrder[columnOrder.indexOf(targetKey) + 1] || ''
+    : targetKey;
+  if (!markerKey || markerKey === columnDragKey) return;
+  document.querySelector(`th[data-col-key="${markerKey}"]`)?.classList.add('col-drop-target');
+}
+
+function previewMoveSelectedColumn(targetKey, insertAfter) {
+  if (!reorderColumnDom(columnDragKey, targetKey, insertAfter)) return;
+  const activeHeader = document.querySelector(`th[data-col-key="${columnDragKey}"]`);
+  if (activeHeader) {
+    activeHeader.classList.add('col-dragging');
+    activeHeader.style.transform = `translateX(${Math.round((columnDragTargetAfter ? 8 : -8) + 0)}px) scale(1.04)`;
+    columnDragHeaderEl = activeHeader;
+  }
+}
+
+function moveHeldColumn(event) {
+  if (!columnDragActive || columnDragPointerId !== event.pointerId || !columnDragKey) return;
   event.preventDefault();
-  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('#tbody tr');
-  if (dragHoverRowEl && dragHoverRowEl !== target) dragHoverRowEl.classList.remove('row-drop-target');
-  if (!target || target === dragRowEl || target.parentElement !== dragRowEl.parentElement) {
-    dragHoverRowEl = null;
+  let dragCenterX = event.clientX;
+  if (columnDragHeaderEl) {
+    const rect = columnDragHeaderEl.getBoundingClientRect();
+    const deltaX = event.clientX - rect.left - columnDragPointerOffsetX;
+    columnDragHeaderEl.style.transform = `translateX(${Math.round(deltaX)}px) scale(1.04)`;
+    dragCenterX = rect.left + columnDragPointerOffsetX + deltaX;
+  }
+
+  const orderedHeaders = columnOrder
+    .map(key => document.querySelector(`th[data-col-key="${key}"]`))
+    .filter(Boolean);
+  const dragIndex = columnOrder.indexOf(columnDragKey);
+  if (dragIndex < 0) {
+    document.querySelectorAll('th[data-col-key]').forEach(th => th.classList.remove('col-drop-target'));
     return;
   }
-  dragHoverRowEl = target;
-  dragHoverRowEl.classList.add('row-drop-target');
-  const targetRect = target.getBoundingClientRect();
-  const insertAfter = event.clientY > targetRect.top + (targetRect.height / 2);
-  const parent = target.parentElement;
-  if (insertAfter) parent.insertBefore(dragRowEl, target.nextSibling);
-  else parent.insertBefore(dragRowEl, target);
+
+  const prevKey = columnOrder[dragIndex - 1] || '';
+  const nextKey = columnOrder[dragIndex + 1] || '';
+  const prevHeader = prevKey ? document.querySelector(`th[data-col-key="${prevKey}"]`) : null;
+  const nextHeader = nextKey ? document.querySelector(`th[data-col-key="${nextKey}"]`) : null;
+
+  if (prevHeader) {
+    const prevRect = prevHeader.getBoundingClientRect();
+    const prevCenter = prevRect.left + (prevRect.width / 2);
+    if (dragCenterX < prevCenter) {
+      updateColumnDropMarker(prevKey, false);
+      if (columnDragTargetKey !== prevKey || columnDragTargetAfter !== false) {
+        columnDragTargetKey = prevKey;
+        columnDragTargetAfter = false;
+        previewMoveSelectedColumn(prevKey, false);
+      }
+      return;
+    }
+  }
+
+  if (nextHeader) {
+    const nextRect = nextHeader.getBoundingClientRect();
+    const nextCenter = nextRect.left + (nextRect.width / 2);
+    if (dragCenterX > nextCenter) {
+      updateColumnDropMarker(nextKey, true);
+      if (columnDragTargetKey !== nextKey || columnDragTargetAfter !== true) {
+        columnDragTargetKey = nextKey;
+        columnDragTargetAfter = true;
+        previewMoveSelectedColumn(nextKey, true);
+      }
+      return;
+    }
+  }
+
+  if (!orderedHeaders.length) {
+    document.querySelectorAll('th[data-col-key]').forEach(th => th.classList.remove('col-drop-target'));
+    return;
+  }
+
+  document.querySelectorAll('th[data-col-key]').forEach(th => th.classList.remove('col-drop-target'));
+  columnDragTargetKey = '';
+  columnDragTargetAfter = false;
 }
 
-function endRowHold(event) {
-  clearTimeout(dragHoldTimer);
-  if (dragRowEl && (!event || dragPointerId === event.pointerId)) {
-    saveManualRowOrder();
+function endColumnHold(event) {
+  clearTimeout(columnDragHoldTimer);
+  if (event && columnDragPointerId !== null && columnDragPointerId !== event.pointerId) return;
+  if (columnDragActive) {
+    saveColumnOrder();
     render();
   }
-  clearDragState();
+  document.querySelectorAll('th[data-col-key]').forEach(th => {
+    th.classList.remove('col-dragging', 'col-drop-target');
+    th.style.transform = '';
+  });
+  columnDragPointerId = null;
+  columnDragHoldTimer = null;
+  columnDragActive = false;
+  columnDragKey = '';
+  columnDragHeaderEl = null;
+  columnDragTargetKey = '';
+  columnDragTargetAfter = false;
+  columnDragStartX = 0;
+  columnDragPointerOffsetX = 0;
 }
 
 function render() {
+  renderColumnHeaderOrder();
   orderMode = loadOrderMode();
   currentData = sortClientsByName(getMonthData(curYear, curMonth));
   const visibleData = currentData.filter(item => !item.deleted);
   document.getElementById('month-label').textContent = reiwaLabel(curYear, curMonth);
-  document.getElementById('date-toggle-btn').textContent = allDateReiwa ? '西暦表示' : '和暦表示';
-  const orderBtn = document.getElementById('order-toggle-btn');
-  if (orderBtn) orderBtn.textContent = orderMode === 'custom' ? '名前順' : 'カスタム';
-  const blankBtn = document.querySelector('.top-add-btn.alt');
-  if (blankBtn) blankBtn.classList.toggle('is-placing', blankInsertMode);
-
+  const warekiBtn = document.getElementById('date-toggle-wareki');
+  const seirekiBtn = document.getElementById('date-toggle-seireki');
+  if (warekiBtn) warekiBtn.classList.toggle('is-active', allDateReiwa);
+  if (seirekiBtn) seirekiBtn.classList.toggle('is-active', !allDateReiwa);
+  const orderNameBtn = document.getElementById('order-toggle-name');
+  const orderCustomBtn = document.getElementById('order-toggle-custom');
+  if (orderNameBtn) orderNameBtn.classList.toggle('is-active', orderMode !== 'custom');
+  if (orderCustomBtn) orderCustomBtn.classList.toggle('is-active', orderMode === 'custom');
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
 
@@ -2145,36 +2648,19 @@ function render() {
     const tr = document.createElement('tr');
     tr.dataset.sourceIndex = String(originalIndex);
     if (CHK.every(key => item[key] === 1)) tr.classList.add('done-row');
-    if (item.rowId && item.rowId === selectedRowId) tr.classList.add('selected-row');
-    if (blankInsertMode && blankInsertIndex === displayIndex) tr.classList.add('blank-insert-target');
     tr.addEventListener('click', event => {
       if (event.target.closest('td')) return;
-      if (blankInsertMode) {
-        insertBlankClientRow(displayIndex);
-        return;
-      }
-      selectRow(originalIndex);
-    });
-    tr.addEventListener('mouseenter', () => {
-      if (!blankInsertMode) return;
-      blankInsertIndex = displayIndex;
-      updateBlankInsertHighlight();
     });
 
     const tdNo = document.createElement('td');
-    tdNo.className = `td-no${orderMode === 'custom' ? ' is-holdable' : ''}`;
+    tdNo.className = 'td-no';
     tdNo.textContent = item.noNumber ? '' : displayIndex + 1;
     bindRowSelection(tdNo, originalIndex);
-    tdNo.addEventListener('pointerdown', event => {
-      event.preventDefault();
-      startRowHold(event, originalIndex);
-    });
     tr.appendChild(tdNo);
 
     const nameTd = document.createElement('td');
     nameTd.className = 'td-name';
     nameTd.innerHTML = `<div class="name-cell">${item.kana ? `<div class="name-kana">${esc(item.kana)}</div>` : ''}<div class="name-main">${esc(item.name)}</div></div>`;
-    bindRowSelection(nameTd, originalIndex);
     nameTd.addEventListener('dblclick', event => {
       event.stopPropagation();
       openNameEditor(originalIndex);
@@ -2184,49 +2670,50 @@ function render() {
     const kosinTd = document.createElement('td');
     kosinTd.className = 'td-kosin';
     kosinTd.textContent = item.kosin || '';
-    bindRowSelection(kosinTd, originalIndex);
     kosinTd.addEventListener('dblclick', event => {
       event.stopPropagation();
       openKosin(originalIndex);
     });
     tr.appendChild(kosinTd);
 
-    const yukoTd = document.createElement('td');
     const yukoStatus = getYukoStatus(item.yuko);
+    const columnCells = {};
+
+    const yukoTd = document.createElement('td');
+    yukoTd.dataset.colKey = 'yuko';
     const yukoStatusClass = yukoStatus === 'done' ? ' expiring-done' : (yukoStatus === 'soon' ? ' expiring' : '');
     yukoTd.className = `td-date${yukoStatusClass}`;
     yukoTd.textContent = yukoStatus === 'blank' ? '' : shortDate(item.yuko);
-    bindRowSelection(yukoTd, originalIndex);
     bindDateCell(yukoTd, () => openPeriodDatePicker(originalIndex, 'yuko', getPeriodFieldLabel('yuko')));
-    tr.appendChild(yukoTd);
+    columnCells.yuko = yukoTd;
 
     const lvTd = document.createElement('td');
+    lvTd.dataset.colKey = 'level';
     lvTd.className = 'td-lv is-clickable';
     lvTd.textContent = item.level;
-    bindRowSelection(lvTd, originalIndex);
     lvTd.addEventListener('dblclick', event => {
       event.stopPropagation();
       openLevelPicker(originalIndex);
     });
-    tr.appendChild(lvTd);
+    columnCells.level = lvTd;
 
     const planLTd = document.createElement('td');
+    planLTd.dataset.colKey = 'planL';
     planLTd.className = `td-date${yukoStatus === 'done' ? ' expiring-done' : (isCurrentLongPlan(item.planL) ? ' plan-long-current' : '')}`;
     planLTd.textContent = yukoStatus === 'blank' ? '' : shortDate(item.planL);
-    bindRowSelection(planLTd, originalIndex);
     bindDateCell(planLTd, () => openPeriodDatePicker(originalIndex, 'planL', getPeriodFieldLabel('planL')));
-    tr.appendChild(planLTd);
+    columnCells.planL = planLTd;
 
     const planSTd = document.createElement('td');
+    planSTd.dataset.colKey = 'planS';
     planSTd.className = `td-date${yukoStatus === 'done' ? ' expiring-done' : (isCurrentShortPlan(item.planS) ? ' plan-current' : '')}`;
     planSTd.textContent = yukoStatus === 'blank' ? '' : shortDate(item.planS);
-    bindRowSelection(planSTd, originalIndex);
     bindDateCell(planSTd, () => openPeriodDatePicker(originalIndex, 'planS', getPeriodFieldLabel('planS')));
-    tr.appendChild(planSTd);
+    columnCells.planS = planSTd;
 
     const visitTd = document.createElement('td');
+    visitTd.dataset.colKey = 'visit';
     visitTd.className = `td-visit${hasVisitValue(item) ? '' : ' is-empty'}`;
-    bindRowSelection(visitTd, originalIndex);
     const tags = [item.visitTag1, item.visitTag2].filter(Boolean);
     const visitCellClass = tags.length === 0 && item.visitDate ? 'visit-cell date-only' : 'visit-cell';
     visitTd.innerHTML = `
@@ -2244,23 +2731,23 @@ function render() {
         clearVisit(originalIndex);
       }
     });
-    tr.appendChild(visitTd);
+    columnCells.visit = visitTd;
 
     CHK.forEach(key => {
       const td = document.createElement('td');
+      td.dataset.colKey = key;
       td.className = 'td-cc';
-      td.innerHTML = `<span class="circle ${item[key] === 1 ? 'on' : 'off'}">${item[key] === 1 ? '○' : '○'}</span>`;
-      bindRowSelection(td, originalIndex);
+      td.innerHTML = `<span class="circle ${item[key] === 1 ? 'on' : 'off'}">${item[key] === 1 ? '✓' : '○'}</span>`;
       td.addEventListener('dblclick', event => {
         event.stopPropagation();
         tog(originalIndex, key);
       });
-      tr.appendChild(td);
+      columnCells[key] = td;
     });
 
     const meetingTd = document.createElement('td');
+    meetingTd.dataset.colKey = 'meeting';
     meetingTd.className = `td-visit${hasMeetingValue(item) ? '' : ' is-empty'}`;
-    bindRowSelection(meetingTd, originalIndex);
     const meetingTags = [item.meetingTag1, item.meetingTag2].filter(Boolean);
     const meetingCellClass = meetingTags.length === 0 && item.meetingDate ? 'visit-cell date-only' : 'visit-cell';
     meetingTd.innerHTML = `
@@ -2278,22 +2765,26 @@ function render() {
         clearMeeting(originalIndex);
       }
     });
-    tr.appendChild(meetingTd);
+    columnCells.meeting = meetingTd;
 
     const sehoTd = document.createElement('td');
+    sehoTd.dataset.colKey = 'seho';
     sehoTd.className = 'td-seho';
     sehoTd.innerHTML = item.seho || item.sehoCw ? `<div class="seho-cell">${item.seho ? `<span class="seho-dot" title="${esc(item.seho)}"></span>` : '<span style="height:10px"></span>'}${item.sehoCw ? `<span class="seho-label">(${esc(item.sehoCw)})</span>` : ''}</div>` : '';
-    bindRowSelection(sehoTd, originalIndex);
     sehoTd.addEventListener('dblclick', event => {
       event.stopPropagation();
       openSehoEditor(originalIndex);
     });
-    tr.appendChild(sehoTd);
+    columnCells.seho = sehoTd;
+
+    columnOrder.forEach(key => {
+      const td = columnCells[key];
+      if (td) tr.appendChild(td);
+    });
 
     const bikoTd = document.createElement('td');
     bikoTd.className = 'td-biko';
     bikoTd.textContent = item.biko || '';
-    bindRowSelection(bikoTd, originalIndex);
     bikoTd.addEventListener('dblclick', event => {
       event.stopPropagation();
       openBiko(originalIndex);
@@ -2302,15 +2793,12 @@ function render() {
     tbody.appendChild(tr);
   });
 
-  updateBlankInsertHighlight();
-
   document.getElementById('s-total').textContent = visibleData.length;
-  document.getElementById('s-notvisited').textContent = visibleData.length - visibleData.filter(item => hasVisitValue(item)).length;
 }
 
-document.addEventListener('pointermove', moveHeldRow, { passive: false });
-document.addEventListener('pointerup', endRowHold);
-document.addEventListener('pointercancel', endRowHold);
+document.addEventListener('pointermove', moveHeldColumn, { passive: false });
+document.addEventListener('pointerup', endColumnHold);
+document.addEventListener('pointercancel', endColumnHold);
 document.getElementById('import-data-input')?.addEventListener('change', event => {
   importLocalDataFromFile(event.target.files?.[0]);
 });
@@ -2322,6 +2810,8 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 }
 
 removeUnusedTaskHeaders();
+columnOrder = loadColumnOrder();
+bindMovableColumnHeaders();
 render();
 </script>
 </body>
