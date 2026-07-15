@@ -39,49 +39,82 @@ input, textarea, select, option {
 }
 .topbar {
   background: linear-gradient(135deg, #4a9e2f 0%, #65b842 55%, #84cc50 100%);
-  padding: 14px 16px;
+  padding: 14px 16px 8px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-direction: column;
   position: sticky;
   top: 0;
   z-index: 20;
   flex: 0 0 auto;
+  gap: 10px;
+  overflow: hidden;
 }
-.app-name { font-size: 16px; font-weight: 700; color: white; letter-spacing: 0.03em; }
-.month-nav { display: flex; align-items: center; gap: 6px; }
+.topbar-divider {
+  width: calc(100% + 32px);
+  margin: -2px -16px 0;
+  height: 1px;
+  background: rgba(255,255,255,0.28);
+}
+.app-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+  line-height: 1.1;
+  padding-left: 0;
+}
+.topbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+}
+.topbar-main::-webkit-scrollbar { height: 6px; }
+.topbar-main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.28); border-radius: 999px; }
+.month-nav { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
 .mbtn {
   background: rgba(255,255,255,0.15);
   border: none;
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  font-size: 16px;
+  border-radius: 7px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
   color: white;
   cursor: pointer;
 }
-.mlabel { font-size: 14px; font-weight: 700; color: white; min-width: 88px; text-align: center; }
+.mlabel { font-size: 13px; font-weight: 700; color: white; min-width: 80px; text-align: center; }
 .stats {
   display: flex;
   gap: 5px;
   align-items: center;
-  flex: 1;
-  margin: 0 10px;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  margin: 0;
+  flex-wrap: nowrap;
+  min-width: max-content;
+  overflow: visible;
 }
 .stat {
   display: flex;
   align-items: center;
-  gap: 3px;
-  padding: 4px 9px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.18);
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(20, 58, 20, 0.18);
 }
-.stat-num { font-size: 13px; font-weight: 700; color: white; }
+.stat-num { font-size: 12px; font-weight: 800; color: white; }
 .stat-num.g { color: #6ee7b7; }
 .stat-num.r { color: #fca5a5; }
 .stat-num.y { color: #fcd34d; }
-.stat-label { font-size: 10px; color: rgba(255,255,255,0.78); }
+.stat-label { font-size: 11px; color: #f8fff4; font-weight: 800; }
 .top-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .top-add-btn {
   height: 28px;
@@ -97,26 +130,24 @@ input, textarea, select, option {
   white-space: nowrap;
 }
 .top-add-btn.primary {
-  height: 36px;
-  padding: 0 14px;
+  height: 32px;
+  padding: 0 12px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.22);
   background: rgba(20, 58, 20, 0.18);
-  backdrop-filter: blur(8px);
   color: #f8fff4;
-  box-shadow: 0 8px 18px rgba(26, 77, 14, 0.16);
 }
 .top-add-btn.primary .top-add-btn-label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
   height: 100%;
   padding: 0;
   background: transparent;
   color: inherit;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
@@ -125,27 +156,26 @@ input, textarea, select, option {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
   background: #f4fbef;
   color: #2d7a1a;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.10);
 }
 .top-add-btn.alt {
   background: rgba(255,255,255,0.18);
   color: white;
 }
 .utility-btn {
-  height: 22px;
-  padding: 0 8px;
-  border-radius: 7px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 5px;
   border: 1px solid rgba(255,255,255,0.34);
   background: rgba(255,255,255,0.10);
   color: #f7fff3;
-  font-size: 9px;
+  font-size: 6px;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
@@ -162,8 +192,8 @@ input, textarea, select, option {
 .month-side-actions {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-right: 6px;
+  gap: 2px;
+  margin-right: 4px;
 }
 .top-toggle-btn {
   height: 28px;
@@ -181,25 +211,29 @@ input, textarea, select, option {
 .date-toggle-group {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px;
-  border-radius: 10px;
+  gap: 3px;
+  padding: 2px;
+  border-radius: 9px;
   background: rgba(255,255,255,0.14);
   border: 1px solid rgba(255,255,255,0.28);
+  flex: 0 1 auto;
+  min-width: 0;
 }
 .date-toggle-btn {
-  height: 28px;
-  min-width: 48px;
-  padding: 0 10px;
-  border-radius: 8px;
+  height: 24px;
+  min-width: 38px;
+  padding: 0 5px;
+  border-radius: 7px;
   border: none;
   background: transparent;
   color: rgba(255,255,255,0.88);
-  font-size: 11px;
+  font-size: clamp(7px, 0.9vw, 9px);
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
 }
 .date-toggle-btn.is-active {
   background: #f4fbef;
@@ -207,7 +241,8 @@ input, textarea, select, option {
   box-shadow: 0 1px 4px rgba(0,0,0,0.12);
 }
 .date-toggle-btn.order-custom {
-  font-size: 9px;
+  min-width: 42px;
+  font-size: clamp(6px, 0.8vw, 8px);
   letter-spacing: 0;
 }
 .tbl-wrap {
@@ -253,8 +288,8 @@ th.h-name {
   vertical-align: middle;
   padding: 0;
 }
-th.h-kosin { width: 40px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; border-right: 2px solid #86d46a; }
-th.h-rot { width: 22px; }
+th.h-kosin { width: 40px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; border-right: 2px solid #86d46a; vertical-align: middle; padding-top: 0; padding-bottom: 0; }
+th.h-rot { width: 28px; }
 th[data-col-key="level"] { width: 28px; vertical-align: middle; padding: 0; }
 th.h-rot-date { width: 50px; vertical-align: middle; padding: 0; }
 th.h-visit { width: 28px; }
@@ -308,6 +343,15 @@ th .inner.split {
 }
 th .inner.split span {
   display: block;
+}
+th .inner.split .sub-label {
+  font-size: 0.84em;
+}
+th.h-visit .inner {
+  font-size: 7px;
+}
+th.h-kosin .label-small {
+  font-size: 0.82em;
 }
 tbody tr:nth-child(even) { background: #f8fcff; }
 tbody tr:nth-child(odd) { background: white; }
@@ -391,6 +435,8 @@ td.td-visit {
   outline: none;
   padding: 2px 1px 3px;
   cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
 }
 td.td-visit.is-empty { color: #cbd5e1; }
 td.td-visit.is-selected {
@@ -447,8 +493,8 @@ td.td-visit.is-selected {
   background: #e2f7d8;
   color: #2d7a1a;
 }
-td.td-cc { cursor: pointer; width: 34px; user-select: none; }
-td.td-seho { width: 46px; cursor: pointer; padding: 2px 2px; }
+td.td-cc { cursor: pointer; width: 28px; user-select: none; text-align: center; vertical-align: middle; }
+td.td-seho { width: 46px; cursor: pointer; padding: 2px 2px; text-align: center; vertical-align: middle; }
 td.td-biko {
   text-align: left;
   display: table-cell;
@@ -791,7 +837,7 @@ td.td-biko {
   th.h-no { width: 28px; }
   th.h-name { width: 60px; padding-left: 0; }
   th.h-kosin { width: 36px; }
-  th.h-rot { width: 20px; }
+  th.h-rot { width: 26px; }
   th.h-rot-date { width: 46px; }
   th.h-visit { width: 26px; }
   th.h-seho { width: 32px; }
@@ -908,6 +954,8 @@ input.modal-input { margin-bottom: 8px; }
 <body>
 <div class="topbar">
   <div class="app-name">利用者チェック表</div>
+  <div class="topbar-divider"></div>
+  <div class="topbar-main">
   <div class="stats">
     <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-label">総数</div></div>
     <button class="top-add-btn primary" onclick="openAddClient()"><span class="top-add-btn-label">利用者追加</span></button>
@@ -929,6 +977,7 @@ input.modal-input { margin-bottom: 8px; }
     <span class="mlabel" id="month-label"></span>
     <button class="mbtn" onclick="changeMonth(1)">›</button>
   </div>
+  </div>
 </div>
 
 <div class="tbl-wrap">
@@ -937,7 +986,7 @@ input.modal-input { margin-bottom: 8px; }
       <tr>
         <th class="h-no">No</th>
         <th class="h-name">利用者名</th>
-        <th class="h-kosin">更新申請等<br>（メモ）</th>
+        <th class="h-kosin"><span class="label-small">更新申請等</span><br>メモ</th>
         <th class="h-rot h-rot-date col-movable" data-col-key="yuko"><span class="inner">有効期間</span></th>
         <th class="h-rot col-movable" data-col-key="level"><span class="inner">介護度</span></th>
         <th class="h-rot h-rot-date col-movable" data-col-key="planL"><span class="inner">長期</span></th>
@@ -945,11 +994,11 @@ input.modal-input { margin-bottom: 8px; }
         <th class="h-rot h-visit col-movable" data-col-key="visit"><span class="inner">訪問日</span></th>
         <th class="h-rot col-movable" data-col-key="monita"><span class="inner">モニ記録</span></th>
         <th class="h-rot col-movable" data-col-key="sikien"><span class="inner">支援経過</span></th>
-        <th class="h-rot col-movable" data-col-key="drive"><span class="inner split"><span>利用票</span><span>ドライブ</span></span></th>
+        <th class="h-rot col-movable" data-col-key="drive"><span class="inner split"><span>利用票</span><span class="sub-label">ドライブ</span></span></th>
         <th class="h-rot col-movable" data-col-key="hand"><span class="inner split"><span>次月</span><span>利用票</span></span></th>
         <th class="h-rot col-movable" data-col-key="fax"><span class="inner split"><span>次月</span><span>提供票</span></span></th>
         <th class="h-rot"><span class="inner">プラン作成</span></th>
-        <th class="h-rot col-movable" data-col-key="meeting"><span class="inner split"><span>担当者</span><span>会議</span></span></th>
+        <th class="h-rot col-movable" data-col-key="meeting"><span class="inner">担会</span></th>
         <th class="h-rot"><span class="inner">照会</span></th>
         <th class="h-rot"><span class="inner">アセス</span></th>
         <th class="h-rot h-seho col-movable" data-col-key="seho"><span class="inner">生保</span></th>
