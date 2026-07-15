@@ -168,6 +168,12 @@ input, textarea, select, option {
   background: rgba(255,255,255,0.18);
   color: white;
 }
+.top-add-btn.alt.is-active {
+  background: #f4fbef;
+  color: #2d7a1a;
+  border-color: rgba(255,255,255,0.7);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
 .utility-btn {
   height: 16px;
   padding: 0 4px;
@@ -294,7 +300,7 @@ th[data-col-key="level"] { width: 28px; vertical-align: middle; padding: 0; }
 th.h-rot-date { width: 50px; vertical-align: middle; padding: 0; }
 th.h-visit { width: 28px; }
 th.h-seho { width: 34px; }
-th.h-biko { width: 168px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; padding-left: 0; border-left: 2px solid #86d46a; min-width: 168px; }
+th.h-biko { width: 168px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; vertical-align: middle; padding-left: 0; padding-right: 0; border-left: 2px solid #86d46a; min-width: 168px; }
 th.col-movable { cursor: pointer; }
 th[data-col-key], td[data-col-key] { transition: background-color 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease; }
 th.col-selected {
@@ -519,7 +525,7 @@ td.td-biko {
   text-align: left;
   display: table-cell;
   vertical-align: middle;
-  padding: 0;
+  padding: 0 0 0 8px;
   font-size: 11px;
   color: #64748b;
   white-space: nowrap;
@@ -922,7 +928,8 @@ td.td-biko {
   font-family: inherit;
 }
 textarea.modal-textarea,
-input.modal-input {
+input.modal-input,
+select.modal-input {
   width: 100%;
   font-size: 13px;
   padding: 10px;
@@ -935,6 +942,12 @@ input.modal-input {
 }
 textarea.modal-textarea { height: 84px; resize: none; }
 input.modal-input { margin-bottom: 8px; }
+select.modal-input {
+  margin-bottom: 8px;
+  height: 42px;
+  -webkit-appearance: none;
+  appearance: none;
+}
 .confirm-bg {
   display: none;
   position: fixed;
@@ -987,6 +1000,8 @@ input.modal-input { margin-bottom: 8px; }
       <button class="date-toggle-btn" id="order-toggle-name" onclick="setOrderMode('name')">名前順</button>
       <button class="date-toggle-btn order-custom" id="order-toggle-custom" onclick="setOrderMode('custom')">カスタム順</button>
     </div>
+    <button class="top-add-btn alt" onclick="openAddColumnModal()">項目追加</button>
+    <button class="top-add-btn alt" id="delete-column-btn" onclick="toggleDeleteColumnMode()">項目削除</button>
   </div>
   <div class="month-nav">
     <div class="month-side-actions">
@@ -1115,8 +1130,14 @@ function newClientData(base) {
     plan: base.plan || 0,
     meeting: base.meeting || 0,
     shokai: base.shokai || 0,
-    assess: base.assess || 0
+    assess: base.assess || 0,
+    customFields: normalizeCustomFieldValues(base.customFields)
   };
+}
+
+function normalizeCustomFieldValues(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).map(([key, fieldValue]) => [key, fieldValue ?? '']));
 }
 
 function parseVisitState(base) {
@@ -1145,8 +1166,9 @@ const STORAGE_KEY = 'riyosha_check_v1';
 const FAC_KEY = 'riyosha_facilities_v1';
 const ORDER_MODE_KEY = 'riyosha_order_mode_v1';
 const COLUMN_ORDER_KEY = 'riyosha_column_order_v1';
+const CUSTOM_COLUMNS_KEY = 'riyosha_custom_columns_v1';
 const CHK = ['monita', 'sikien', 'drive', 'hand', 'fax'];
-const MOVABLE_COLUMN_KEYS = ['yuko', 'level', 'planL', 'planS', 'visit', 'monita', 'sikien', 'drive', 'hand', 'fax', 'meeting', 'seho'];
+const BASE_MOVABLE_COLUMN_KEYS = ['yuko', 'level', 'planL', 'planS', 'visit', 'monita', 'sikien', 'drive', 'hand', 'fax', 'meeting', 'seho'];
 const nameCollator = new Intl.Collator('ja', { sensitivity: 'base', numeric: true });
 const NAME_YOMI = {};
 const EXPORT_SCHEMA_VERSION = 1;
@@ -1163,7 +1185,8 @@ let pendingDateClick = null;
 let pendingVisitClick = null;
 let orderMode = 'name';
 let addClientDraft = null;
-let columnOrder = [...MOVABLE_COLUMN_KEYS];
+let customColumns = [];
+let columnOrder = [...BASE_MOVABLE_COLUMN_KEYS];
 let selectedColumnKey = '';
 let columnDragPointerId = null;
 let columnDragHoldTimer = null;
@@ -1203,6 +1226,64 @@ function loadAll() {
   }
 }
 
+function loadCustomColumns() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CUSTOM_COLUMNS_KEY) || '[]');
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map(item => ({
+        key: String(item.key || '').trim(),
+        label: String(item.label || '').trim(),
+        type: item.type === 'date' ? 'date' : 'check'
+      }))
+      .filter(item => item.key && item.label);
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomColumns() {
+  localStorage.setItem(CUSTOM_COLUMNS_KEY, JSON.stringify(customColumns));
+}
+
+function getAllMovableColumnKeys() {
+  return [...BASE_MOVABLE_COLUMN_KEYS, ...customColumns.map(item => item.key)];
+}
+
+function getCustomColumn(key) {
+  return customColumns.find(item => item.key === key) || null;
+}
+
+function isCustomColumnKey(key) {
+  return Boolean(getCustomColumn(key));
+}
+
+function isCustomCheckColumn(key) {
+  return getCustomColumn(key)?.type === 'check';
+}
+
+function isCustomDateColumn(key) {
+  return getCustomColumn(key)?.type === 'date';
+}
+
+function makeCustomColumnKey() {
+  return `customcol_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function getFieldValue(item, field) {
+  if (isCustomColumnKey(field)) return item.customFields?.[field] || '';
+  return item[field];
+}
+
+function setFieldValue(item, field, value) {
+  if (isCustomColumnKey(field)) {
+    item.customFields = normalizeCustomFieldValues(item.customFields);
+    item.customFields[field] = value;
+    return;
+  }
+  item[field] = value;
+}
+
 function loadOrderMode() {
   try {
     const saved = localStorage.getItem(ORDER_MODE_KEY);
@@ -1215,12 +1296,13 @@ function loadOrderMode() {
 function loadColumnOrder() {
   try {
     const saved = JSON.parse(localStorage.getItem(COLUMN_ORDER_KEY) || '[]');
-    if (!Array.isArray(saved)) return [...MOVABLE_COLUMN_KEYS];
-    const valid = saved.filter(key => MOVABLE_COLUMN_KEYS.includes(key));
-    const missing = MOVABLE_COLUMN_KEYS.filter(key => !valid.includes(key));
+    const movableKeys = getAllMovableColumnKeys();
+    if (!Array.isArray(saved)) return [...movableKeys];
+    const valid = saved.filter(key => movableKeys.includes(key));
+    const missing = movableKeys.filter(key => !valid.includes(key));
     return [...valid, ...missing];
   } catch {
-    return [...MOVABLE_COLUMN_KEYS];
+    return [...getAllMovableColumnKeys()];
   }
 }
 
@@ -1461,7 +1543,8 @@ function syncClientList(data) {
       seho: existing.seho !== undefined ? existing.seho : (base.seho || ''),
       sehoCw: existing.sehoCw !== undefined ? existing.sehoCw : (base.sehoCw || ''),
       kaigoken: existing.kaigoken !== undefined ? existing.kaigoken : (base.kaigoken || ''),
-      biko: existing.biko !== undefined ? existing.biko : (base.biko || '')
+      biko: existing.biko !== undefined ? existing.biko : (base.biko || ''),
+      customFields: normalizeCustomFieldValues(existing.customFields)
     });
   });
   normalized.forEach(item => {
@@ -1544,7 +1627,8 @@ function buildExportPayload() {
     appTitle: document.querySelector('.app-name')?.textContent || '',
     data: loadAll(),
     facilities: loadFacilities(),
-    orderMode: loadOrderMode()
+    orderMode: loadOrderMode(),
+    customColumns: loadCustomColumns()
   };
 }
 
@@ -1600,10 +1684,14 @@ function importLocalDataFromFile(file) {
       const data = parsed && typeof parsed === 'object' ? parsed.data : null;
       const facilities = parsed && typeof parsed === 'object' ? parsed.facilities : null;
       const importedOrderMode = parsed && typeof parsed === 'object' ? parsed.orderMode : null;
+      const importedCustomColumns = parsed && typeof parsed === 'object' ? parsed.customColumns : null;
       if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('invalid');
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       localStorage.setItem(FAC_KEY, JSON.stringify(Array.isArray(facilities) ? facilities : []));
       localStorage.setItem(ORDER_MODE_KEY, importedOrderMode === 'custom' ? 'custom' : 'name');
+      localStorage.setItem(CUSTOM_COLUMNS_KEY, JSON.stringify(Array.isArray(importedCustomColumns) ? importedCustomColumns : []));
+      customColumns = loadCustomColumns();
+      columnOrder = loadColumnOrder();
       orderMode = loadOrderMode();
       currentData = getMonthData(curYear, curMonth);
       render();
@@ -1626,7 +1714,8 @@ function esc(value) {
 function getPeriodFieldLabel(field) {
   if (field === 'yuko') return '有効期間';
   if (field === 'planL') return '長期';
-  return '短期';
+  if (field === 'planS') return '短期';
+  return getCustomColumn(field)?.label || '短期';
 }
 
 function shortDate(value) {
@@ -1738,7 +1827,8 @@ function setOrderMode(mode) {
 }
 
 function tog(i, key) {
-  currentData[i][key] = currentData[i][key] === 1 ? 0 : 1;
+  const current = getFieldValue(currentData[i], key);
+  setFieldValue(currentData[i], key, current === 1 ? 0 : 1);
   saveMonthData(curYear, curMonth, currentData);
   render();
 }
@@ -1941,7 +2031,7 @@ function renderVisitCalendar() {
   renderCalendarSelects(yearSelect, monthSelect, visitPickerYear, visitPickerMonth);
   grid.innerHTML = '';
 
-  const selectedRaw = String(currentData[modalIndex][datePickerField] || '');
+  const selectedRaw = String(getFieldValue(currentData[modalIndex], datePickerField) || '');
   let selectedDay = null;
   if (datePickerField === 'visitDate' || datePickerField === 'meetingDate') {
     const match = selectedRaw.match(/^(\d{1,2})日$/);
@@ -1993,12 +2083,12 @@ function renderVisitCalendar() {
         return;
       }
       if (selectedDay === day) {
-        currentData[modalIndex][datePickerField] = '';
+        setFieldValue(currentData[modalIndex], datePickerField, '');
         saveMonthData(curYear, curMonth, currentData);
         openPeriodDatePicker(modalIndex, datePickerField, getPeriodFieldLabel(datePickerField));
         return;
       }
-      currentData[modalIndex][datePickerField] = formatWareki(visitPickerYear, visitPickerMonth, day);
+      setFieldValue(currentData[modalIndex], datePickerField, formatWareki(visitPickerYear, visitPickerMonth, day));
       saveMonthData(curYear, curMonth, currentData);
       openPeriodDatePicker(modalIndex, datePickerField, getPeriodFieldLabel(datePickerField));
     };
@@ -2032,7 +2122,7 @@ function openPeriodDatePicker(i, field, label) {
   datePickerField = field;
   const modal = document.getElementById('modal');
   modal.classList.add('calendar-picker');
-  const parsed = parseAnyDate(currentData[i][field]) || { year: curYear, month: curMonth, day: null };
+  const parsed = parseAnyDate(getFieldValue(currentData[i], field)) || { year: curYear, month: curMonth, day: null };
   visitPickerYear = parsed.year;
   visitPickerMonth = parsed.month;
   showModal(label, currentData[i].name,
@@ -2059,7 +2149,7 @@ function openPeriodDatePicker(i, field, label) {
 }
 
 function clearDateField(i, field, keepModalOpen) {
-  currentData[i][field] = '';
+  setFieldValue(currentData[i], field, '');
   saveMonthData(curYear, curMonth, currentData);
   if (keepModalOpen) {
     openPeriodDatePicker(i, field, getPeriodFieldLabel(field));
@@ -2577,6 +2667,78 @@ function saveNameEditor() {
   render();
 }
 
+function openAddColumnModal() {
+  showModal('項目追加', '',
+    `<input class="modal-input" id="add-column-label" placeholder="項目名">
+     <select class="modal-input" id="add-column-type">
+       <option value="check">〇のチェック項目</option>
+       <option value="date">カレンダー項目</option>
+     </select>
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveAddedColumn()">追加する</button>`
+  );
+  document.getElementById('modal').classList.add('compact-picker');
+}
+
+function saveAddedColumn() {
+  const label = (document.getElementById('add-column-label')?.value || '').trim();
+  const type = document.getElementById('add-column-type')?.value === 'date' ? 'date' : 'check';
+  const target = 'seho';
+  if (!label) {
+    alert('項目名を入力してください');
+    return;
+  }
+  const key = makeCustomColumnKey();
+  customColumns = [...customColumns, { key, label, type }];
+  saveCustomColumns();
+  const nextOrder = columnOrder.filter(item => item !== key);
+  const targetIndex = nextOrder.indexOf(target);
+  if (targetIndex >= 0) nextOrder.splice(targetIndex + 1, 0, key);
+  else nextOrder.push(key);
+  columnOrder = nextOrder.filter((item, index, arr) => arr.indexOf(item) === index);
+  columnOrder.push(...getAllMovableColumnKeys().filter(item => !columnOrder.includes(item)));
+  saveColumnOrder();
+  currentData.forEach(item => {
+    item.customFields = normalizeCustomFieldValues(item.customFields);
+    item.customFields[key] = type === 'check' ? 0 : '';
+  });
+  saveMonthData(curYear, curMonth, currentData);
+  closeModal();
+  render();
+}
+
+function toggleDeleteColumnMode() {
+  if (!selectedColumnKey) {
+    alert('消したい項目を先にダブルクリックしてください');
+    return;
+  }
+  confirmDeleteColumn(selectedColumnKey);
+}
+
+function confirmDeleteColumn(key) {
+  const column = getCustomColumn(key);
+  if (!column) {
+    alert('追加した項目のみ削除できます');
+    return;
+  }
+  document.getElementById('cf-title').textContent = '項目を削除';
+  document.getElementById('cf-msg').textContent = `${column.label} を削除しますか？`;
+  document.getElementById('cf-ok').onclick = () => {
+    customColumns = customColumns.filter(item => item.key !== key);
+    saveCustomColumns();
+    columnOrder = columnOrder.filter(item => item !== key);
+    saveColumnOrder();
+    currentData.forEach(item => {
+      item.customFields = normalizeCustomFieldValues(item.customFields);
+      delete item.customFields[key];
+    });
+    saveMonthData(curYear, curMonth, currentData);
+    if (selectedColumnKey === key) selectedColumnKey = '';
+    closeConfirm();
+    render();
+  };
+  document.getElementById('confirm').classList.add('show');
+}
+
 function cellEdit(td, i, field, currentValue, multiline) {
   if (td.querySelector('input,textarea')) return;
   const original = td.innerHTML;
@@ -2646,8 +2808,17 @@ function closeConfirm() {
 function renderColumnHeaderOrder() {
   const headerRow = document.querySelector('thead tr');
   if (!headerRow) return;
+  Array.from(headerRow.querySelectorAll('th[data-custom-col="1"]')).forEach(th => th.remove());
   const fixedStart = Array.from(headerRow.querySelectorAll('th')).slice(0, 3);
   const fixedEnd = headerRow.querySelector('th.h-biko');
+  customColumns.forEach(item => {
+    const th = document.createElement('th');
+    th.className = `h-rot${item.type === 'date' ? ' h-rot-date' : ''} col-movable`;
+    th.dataset.colKey = item.key;
+    th.dataset.customCol = '1';
+    th.innerHTML = `<span class="inner">${esc(item.label)}</span>`;
+    headerRow.insertBefore(th, fixedEnd);
+  });
   const movableMap = new Map(
     Array.from(headerRow.querySelectorAll('th[data-col-key]')).map(th => [th.dataset.colKey, th])
   );
@@ -2662,6 +2833,7 @@ function renderColumnHeaderOrder() {
   Array.from(headerRow.querySelectorAll('th[data-col-key]')).forEach(th => {
     th.classList.toggle('col-selected', th.dataset.colKey === selectedColumnKey);
   });
+  bindMovableColumnHeaders();
 }
 
 function moveColumnKeyInOrder(sourceKey, targetKey, insertAfter) {
@@ -2989,6 +3161,28 @@ function render() {
     });
     columnCells.seho = sehoTd;
 
+    customColumns.forEach(column => {
+      if (column.type === 'check') {
+        const td = document.createElement('td');
+        const value = Number(getFieldValue(item, column.key)) === 1 ? 1 : 0;
+        td.dataset.colKey = column.key;
+        td.className = 'td-cc';
+        td.innerHTML = `<span class="circle ${value === 1 ? 'on' : 'off'}">${value === 1 ? '✓' : '○'}</span>`;
+        td.addEventListener('dblclick', event => {
+          event.stopPropagation();
+          tog(originalIndex, column.key);
+        });
+        columnCells[column.key] = td;
+        return;
+      }
+      const td = document.createElement('td');
+      td.dataset.colKey = column.key;
+      td.className = 'td-date';
+      td.textContent = shortDate(getFieldValue(item, column.key) || '');
+      bindDateCell(td, () => openPeriodDatePicker(originalIndex, column.key, column.label));
+      columnCells[column.key] = td;
+    });
+
     columnOrder.forEach(key => {
       const td = columnCells[key];
       if (td) tr.appendChild(td);
@@ -3025,6 +3219,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 }
 
 removeUnusedTaskHeaders();
+customColumns = loadCustomColumns();
 columnOrder = loadColumnOrder();
 bindMovableColumnHeaders();
 render();
