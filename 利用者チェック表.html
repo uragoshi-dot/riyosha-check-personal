@@ -139,6 +139,147 @@ input, textarea, select, option {
   flex-wrap: nowrap;
   min-width: max-content;
 }
+.reorder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 64vh;
+  overflow-y: auto;
+  padding-right: 1px;
+}
+.reorder-item {
+  display: block;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid #b3e89a;
+  border-radius: 8px;
+  background: #f9fef5;
+  cursor: pointer;
+}
+.reorder-item.is-selected {
+  background: #dcfce7;
+  border-color: #65b842;
+  box-shadow: inset 0 0 0 1px #65b842;
+}
+.reorder-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a4d0e;
+  text-align: left;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.reorder-hint {
+  font-size: 10px;
+  color: #f8fff4;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+.editor-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.editor-list {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  align-items: stretch;
+  padding-bottom: 2px;
+}
+.editor-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 72px;
+  min-height: 54px;
+  padding: 6px 4px;
+  border: 1px solid #b3e89a;
+  border-radius: 8px;
+  background: #f9fef5;
+  text-align: center;
+}
+.editor-row.is-selected {
+  background: #dcfce7;
+  border-color: #65b842;
+  box-shadow: inset 0 0 0 1px #65b842;
+}
+.editor-row-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #1a4d0e;
+  line-height: 1.1;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: clip;
+  word-break: break-word;
+}
+.editor-row-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.editor-chip {
+  min-width: 34px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 1px solid #b3e89a;
+  background: #edf9e7;
+  color: #2d7a1a;
+  font-size: 8px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+}
+.editor-action-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: #65b842;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0 8px;
+}
+.editor-action-btn.subtle {
+  background: #edf9e7;
+  color: #2d7a1a;
+  border: 1px solid #b3e89a;
+  flex: 1.25 1 0;
+}
+.editor-action-btn.danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+.editor-action-btn.is-active {
+  background: #dcfce7;
+  color: #1f6f12;
+  border: 1px solid #65b842;
+}
+.editor-action-btn.danger.is-active {
+  background: #fecaca;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
 .top-add-btn {
   height: 28px;
   padding: 0 10px;
@@ -284,10 +425,6 @@ input, textarea, select, option {
   user-select: none;
   -webkit-touch-callout: none;
 }
-.tbl-wrap.row-drag-lock {
-  overflow: hidden;
-  touch-action: none;
-}
 table, thead, tbody, tr, th, td, button, span, div {
   -webkit-touch-callout: none;
 }
@@ -325,8 +462,14 @@ th.h-kosin { width: 40px; font-size: 8px; color: #2d7a1a; font-weight: 700; text
 th.h-rot { width: 28px; }
 th[data-col-key="level"] { width: 28px; vertical-align: middle; padding: 0; }
 th.h-rot-date { width: 50px; vertical-align: middle; padding: 0; }
-th.h-visit { width: 28px; }
+th.h-visit { width: 34px; }
 th.h-seho { width: 34px; }
+th[data-col-key="monita"],
+th[data-col-key="sikien"],
+th[data-col-key="drive"],
+th[data-col-key="hand"],
+th[data-col-key="fax"],
+th[data-col-key="meeting"] { width: 34px; }
 th.h-biko { width: 168px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; vertical-align: middle; padding-left: 0; padding-right: 0; border-left: 2px solid #86d46a; min-width: 168px; }
 th.col-movable { cursor: pointer; }
 th[data-col-key], td[data-col-key] { transition: background-color 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease; }
@@ -423,7 +566,7 @@ td {
   font-size: 12px;
   color: #92400e;
 }
-td.td-no { font-size: 10px; color: #86d46a; font-weight: 700; width: 30px; text-align: center; vertical-align: middle; padding: 0; touch-action: none; -webkit-user-select: none; user-select: none; }
+td.td-no { font-size: 10px; color: #86d46a; font-weight: 700; width: 30px; text-align: center; vertical-align: middle; padding: 0; -webkit-user-select: none; user-select: none; }
 td.td-lv { min-width: 28px; }
 td.td-name {
   text-align: center;
@@ -484,7 +627,7 @@ td.td-date.plan-current { color: #dc2626; font-weight: 700; }
 td.td-lv { font-size: 11px; font-weight: 700; color: #2d7a1a; width: 28px; }
 td.td-lv.is-clickable { cursor: pointer; }
 td.td-visit {
-  width: 28px;
+  width: 46px;
   outline: none;
   padding: 2px 1px 3px;
   cursor: pointer;
@@ -546,7 +689,7 @@ td.td-visit.is-selected {
   background: #e2f7d8;
   color: #2d7a1a;
 }
-td.td-cc { cursor: pointer; width: 28px; user-select: none; text-align: center; vertical-align: middle; }
+td.td-cc { cursor: pointer; width: 46px; user-select: none; text-align: center; vertical-align: middle; }
 td.td-seho { width: 46px; cursor: pointer; padding: 2px 2px; text-align: center; vertical-align: middle; }
 td.td-biko {
   text-align: left;
@@ -662,6 +805,21 @@ td.td-biko {
   margin-top: 8px;
   padding: 10px;
   font-size: 12px;
+}
+.modal-bg.column-editor-picker { align-items: center; padding: 12px 16px; }
+.modal-bg.column-editor-picker .modal {
+  border-radius: 16px;
+  max-width: 720px;
+  width: min(92vw, 720px);
+  max-height: none;
+  padding: 16px;
+}
+.modal-bg.column-editor-picker .modal-name {
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+.modal-bg.column-editor-picker .modal-close {
+  margin-top: 10px;
 }
 .modal-bg.calendar-picker { align-items: center; padding: 8px 12px; }
 .modal-bg.calendar-picker .modal {
@@ -892,8 +1050,14 @@ td.td-biko {
   th.h-kosin { width: 36px; }
   th.h-rot { width: 26px; }
   th.h-rot-date { width: 46px; }
-  th.h-visit { width: 26px; }
+  th.h-visit { width: 32px; }
   th.h-seho { width: 32px; }
+  th[data-col-key="monita"],
+  th[data-col-key="sikien"],
+  th[data-col-key="drive"],
+  th[data-col-key="hand"],
+  th[data-col-key="fax"],
+  th[data-col-key="meeting"] { width: 32px; }
   th[data-col-key="level"] { width: 26px; }
   th.h-biko { min-width: 150px; width: 150px; padding-left: 0; }
   td.td-no { width: 28px; }
@@ -1038,8 +1202,8 @@ select.modal-input {
       <button class="date-toggle-btn" id="order-toggle-name" onclick="setOrderMode('name')">名前順</button>
       <button class="date-toggle-btn order-custom" id="order-toggle-custom" onclick="setOrderMode('custom')">カスタム順</button>
     </div>
-    <button class="top-add-btn alt" onclick="openAddColumnModal()">項目追加</button>
-    <button class="top-add-btn alt" id="delete-column-btn" onclick="toggleDeleteColumnMode()">項目削除</button>
+    <button class="top-add-btn alt" onclick="openRowReorderModal()">利用者編集</button>
+    <button class="top-add-btn alt" onclick="openColumnEditorModal()">項目編集</button>
   </div>
   <div class="month-side-actions">
     <button class="utility-btn backup" onclick="exportLocalData()">バックアップ</button>
@@ -1066,7 +1230,7 @@ select.modal-input {
         <th class="h-rot col-movable" data-col-key="hand"><span class="inner split"><span>次月</span><span>利用票</span></span></th>
         <th class="h-rot col-movable" data-col-key="fax"><span class="inner split"><span>次月</span><span>提供票</span></span></th>
         <th class="h-rot"><span class="inner">プラン作成</span></th>
-        <th class="h-rot col-movable" data-col-key="meeting"><span class="inner">担会</span></th>
+        <th class="h-rot col-movable" data-col-key="meeting"><span class="inner">担会日</span></th>
         <th class="h-rot"><span class="inner">照会</span></th>
         <th class="h-rot"><span class="inner">アセス</span></th>
         <th class="h-rot h-seho col-movable" data-col-key="seho"><span class="inner">生保</span></th>
@@ -2584,12 +2748,15 @@ function bindRowSelection(cell, i) {
     event.preventDefault();
     toggleRowSelection(event);
   });
-  cell.addEventListener('pointerdown', event => {
-    const row = cell.parentElement;
-    const rowId = row?.dataset.rowId || '';
-    if (!row || !rowId || selectedRowId !== rowId) return;
-    event.preventDefault();
-    startRowHold(event, row);
+}
+
+function bindRowTapSelection(row) {
+  row.addEventListener('click', event => {
+    if (event.target.closest('button, input, textarea, select, option')) return;
+    const rowId = row.dataset.rowId || '';
+    if (!rowId) return;
+    selectedRowId = selectedRowId === rowId ? '' : rowId;
+    applySelectedRowState();
   });
 }
 
@@ -2724,6 +2891,80 @@ function openAddColumnModal() {
   document.getElementById('modal').classList.add('compact-picker');
 }
 
+function getBaseColumnEditorItems() {
+  return [
+    { key: 'yuko', label: '有効期間', type: 'date', custom: false },
+    { key: 'level', label: '介護度', type: 'fixed', custom: false },
+    { key: 'planL', label: '長期', type: 'date', custom: false },
+    { key: 'planS', label: '短期', type: 'date', custom: false },
+    { key: 'visit', label: '訪問日', type: 'fixed', custom: false },
+    { key: 'monita', label: 'モニ記録', type: 'check', custom: false },
+    { key: 'sikien', label: '支援経過', type: 'check', custom: false },
+    { key: 'drive', label: '利用票ドライブ', type: 'check', custom: false },
+    { key: 'hand', label: '次月利用票', type: 'check', custom: false },
+    { key: 'fax', label: '次月提供票', type: 'check', custom: false },
+    { key: 'meeting', label: '担会日', type: 'fixed', custom: false },
+    { key: 'seho', label: '生保', type: 'fixed', custom: false }
+  ];
+}
+
+function getColumnEditorItems() {
+  const fixedMap = new Map(getBaseColumnEditorItems().map(item => [item.key, item]));
+  return columnOrder.map(key => {
+    const fixed = fixedMap.get(key);
+    if (fixed) return fixed;
+    const custom = getCustomColumn(key);
+    return {
+      key,
+      label: custom?.label || key,
+      type: custom?.type || 'check',
+      custom: true
+    };
+  });
+}
+
+function openColumnEditorModal() {
+  columnEditorReorderMode = false;
+  selectedColumnReorderKey = '';
+  renderColumnEditorModal();
+}
+
+function renderColumnEditorModal() {
+  const items = getColumnEditorItems();
+  showModal('項目編集', '',
+    `<div class="editor-actions">
+      <button class="editor-action-btn" onclick="openAddColumnModal()">追加</button>
+      <button class="editor-action-btn subtle${columnEditorReorderMode ? ' is-active' : ''}" onclick="toggleColumnEditorReorderMode()">並び替え</button>
+    </div>
+    <div class="reorder-hint">${columnEditorReorderMode ? (selectedColumnReorderKey ? '緑の項目を移動中です。入れたい位置の項目を押してください。' : '移動したい項目を押してください。') : '横列の項目一覧です。追加項目のみ削除できます。'}</div>
+    <div class="editor-list">
+      ${items.map(item => `
+        <div class="editor-row${(columnEditorReorderMode ? selectedColumnReorderKey === item.key : selectedColumnKey === item.key) ? ' is-selected' : ''}" onclick="${columnEditorReorderMode ? `tapColumnReorder('${esc(item.key)}')` : `selectColumnEditorItem('${esc(item.key)}')`}">
+          <div class="editor-row-label">${esc(item.label)}</div>
+          <div class="editor-row-actions">
+            ${columnEditorReorderMode
+              ? ``
+              : `${item.custom ? `<button class="editor-chip" onclick="event.stopPropagation();confirmDeleteColumn('${esc(item.key)}')">削除</button>` : ''}`
+            }
+          </div>
+        </div>
+      `).join('')}
+    </div>`
+  );
+  document.getElementById('modal').classList.add('column-editor-picker');
+}
+
+function selectColumnEditorItem(key) {
+  selectedColumnKey = selectedColumnKey === key ? '' : key;
+  renderColumnEditorModal();
+}
+
+function toggleColumnEditorReorderMode() {
+  columnEditorReorderMode = !columnEditorReorderMode;
+  selectedColumnReorderKey = '';
+  renderColumnEditorModal();
+}
+
 function saveAddedColumn() {
   const label = (document.getElementById('add-column-label')?.value || '').trim();
   const type = document.getElementById('add-column-type')?.value === 'date' ? 'date' : 'check';
@@ -2747,8 +2988,8 @@ function saveAddedColumn() {
     item.customFields[key] = type === 'check' ? 0 : '';
   });
   saveMonthData(curYear, curMonth, currentData);
-  closeModal();
   render();
+  renderColumnEditorModal();
 }
 
 function toggleDeleteColumnMode() {
@@ -2780,8 +3021,177 @@ function confirmDeleteColumn(key) {
     if (selectedColumnKey === key) selectedColumnKey = '';
     closeConfirm();
     render();
+    renderColumnEditorModal();
   };
   document.getElementById('confirm').classList.add('show');
+}
+
+function moveArrayItem(list, index, delta) {
+  const nextIndex = index + delta;
+  if (index < 0 || nextIndex < 0 || index >= list.length || nextIndex >= list.length) return list;
+  const next = [...list];
+  const [item] = next.splice(index, 1);
+  next.splice(nextIndex, 0, item);
+  return next;
+}
+
+function getVisibleRowItems() {
+  return currentData.filter(item => !item.deleted);
+}
+
+function updateManualOrderFromVisibleRows(visibleRows) {
+  const visibleIds = visibleRows.map(item => item.rowId);
+  const visibleMap = new Map(visibleRows.map((item, index) => [item.rowId, { ...item, manualOrder: item.noNumber ? Number.MAX_SAFE_INTEGER + index : index }]));
+  const reordered = [];
+  visibleIds.forEach(id => {
+    const item = visibleMap.get(id);
+    if (item) reordered.push(item);
+  });
+  currentData.forEach(item => {
+    if (item.deleted) reordered.push(item);
+  });
+  currentData = reordered;
+}
+
+let selectedRowReorderId = '';
+let selectedColumnReorderKey = '';
+let columnEditorReorderMode = false;
+let rowEditorReorderMode = false;
+let rowEditorDeleteMode = false;
+
+function openRowReorderModal() {
+  if (loadOrderMode() !== 'custom') {
+    alert('カスタム順をクリックしてください');
+    return;
+  }
+  saveOrderMode('custom');
+  selectedRowReorderId = '';
+  rowEditorReorderMode = false;
+  rowEditorDeleteMode = false;
+  renderRowReorderModal();
+}
+
+function renderRowReorderModal() {
+  const rows = getVisibleRowItems();
+  showModal('行並び替え', '',
+    `<div class="editor-actions">
+      <button class="editor-action-btn" onclick="openAddClient()">追加</button>
+      <button class="editor-action-btn subtle${rowEditorReorderMode ? ' is-active' : ''}" onclick="toggleRowEditorReorderMode()">並び替え</button>
+      <button class="editor-action-btn danger${rowEditorDeleteMode ? ' is-active' : ''}" onclick="toggleRowEditorDeleteMode()">削除</button>
+    </div>
+    <div class="reorder-hint">${rowEditorDeleteMode ? '削除したい利用者名を押してください。' : (rowEditorReorderMode ? (selectedRowReorderId ? '緑の利用者を移動中です。入れたい位置の利用者名を押してください。' : '移動したい利用者名を押してください。') : '利用者一覧です。')}</div>
+    <div class="reorder-list">
+      ${rows.map(item => {
+        const isSelected = item.rowId === selectedRowReorderId;
+        return `
+        <div class="reorder-item${isSelected ? ' is-selected' : ''}" onclick="tapRowReorder('${esc(item.rowId)}')">
+          <div class="reorder-label">${esc(item.name || '空欄')}</div>
+        </div>`;
+      }).join('')}
+    </div>`
+  );
+  document.getElementById('modal').classList.add('compact-picker');
+}
+
+function toggleRowEditorReorderMode() {
+  rowEditorReorderMode = !rowEditorReorderMode;
+  rowEditorDeleteMode = false;
+  selectedRowReorderId = '';
+  renderRowReorderModal();
+}
+
+function toggleRowEditorDeleteMode() {
+  rowEditorReorderMode = false;
+  rowEditorDeleteMode = !rowEditorDeleteMode;
+  selectedRowReorderId = '';
+  renderRowReorderModal();
+}
+
+function tapRowReorder(rowId) {
+  if (rowEditorDeleteMode) {
+    const index = currentData.findIndex(item => item.rowId === rowId);
+    if (index >= 0) confirmDelete(index);
+    return;
+  }
+  if (!rowEditorReorderMode) return;
+  if (!selectedRowReorderId) {
+    selectedRowReorderId = rowId;
+    renderRowReorderModal();
+    return;
+  }
+  if (selectedRowReorderId === rowId) {
+    selectedRowReorderId = '';
+    renderRowReorderModal();
+    return;
+  }
+  const rows = getVisibleRowItems();
+  const movingIndex = rows.findIndex(item => item.rowId === selectedRowReorderId);
+  const targetIndex = rows.findIndex(item => item.rowId === rowId);
+  if (movingIndex < 0 || targetIndex < 0) return;
+  const nextRows = [...rows];
+  const [moving] = nextRows.splice(movingIndex, 1);
+  const insertIndex = nextRows.findIndex(item => item.rowId === rowId);
+  if (insertIndex < 0) return;
+  nextRows.splice(insertIndex, 0, moving);
+  updateManualOrderFromVisibleRows(nextRows);
+  saveMonthData(curYear, curMonth, currentData);
+  selectedRowReorderId = '';
+  renderRowReorderModal();
+  render();
+}
+
+function getColumnLabelForReorder(key) {
+  const labels = {
+    yuko: '有効期間',
+    level: '介護度',
+    planL: '長期',
+    planS: '短期',
+    visit: '訪問日',
+    monita: 'モニ記録',
+    sikien: '支援経過',
+    drive: '利用票ドライブ',
+    hand: '次月利用票',
+    fax: '次月提供票',
+    meeting: '担会日',
+    seho: '生保'
+  };
+  return labels[key] || getCustomColumn(key)?.label || key;
+}
+
+function openColumnReorderModal(fromEditor) {
+  columnEditorReorderMode = true;
+  selectedColumnReorderKey = '';
+  renderColumnEditorModal();
+}
+
+function renderColumnReorderModal(fromEditor) {
+  openColumnReorderModal(fromEditor);
+}
+
+function tapColumnReorder(key) {
+  if (!selectedColumnReorderKey) {
+    selectedColumnReorderKey = key;
+    renderColumnEditorModal();
+    return;
+  }
+  if (selectedColumnReorderKey === key) {
+    selectedColumnReorderKey = '';
+    renderColumnEditorModal();
+    return;
+  }
+  const nextOrder = [...columnOrder];
+  const movingIndex = nextOrder.indexOf(selectedColumnReorderKey);
+  const targetIndex = nextOrder.indexOf(key);
+  if (movingIndex < 0 || targetIndex < 0) return;
+  const [moving] = nextOrder.splice(movingIndex, 1);
+  const insertIndex = nextOrder.indexOf(key);
+  if (insertIndex < 0) return;
+  nextOrder.splice(insertIndex, 0, moving);
+  columnOrder = nextOrder;
+  saveColumnOrder();
+  selectedColumnReorderKey = '';
+  render();
+  renderColumnEditorModal();
 }
 
 function cellEdit(td, i, field, currentValue, multiline) {
@@ -2822,7 +3232,7 @@ function showModal(col, name, html) {
 }
 
 function closeModal() {
-  document.getElementById('modal').classList.remove('show', 'add-client', 'compact-picker', 'calendar-picker', 'visit-calendar-open');
+  document.getElementById('modal').classList.remove('show', 'add-client', 'compact-picker', 'calendar-picker', 'visit-calendar-open', 'column-editor-picker');
   datePickerField = '';
 }
 
@@ -2921,12 +3331,6 @@ function bindMovableColumnHeaders() {
       const key = th.dataset.colKey || '';
       selectedColumnKey = selectedColumnKey === key ? '' : key;
       renderColumnHeaderOrder();
-    });
-    th.addEventListener('pointerdown', event => {
-      const key = th.dataset.colKey || '';
-      if (!selectedColumnKey || selectedColumnKey !== key) return;
-      event.preventDefault();
-      startColumnHold(event, key, th);
     });
   });
 }
@@ -3077,9 +3481,7 @@ function render() {
     tr.dataset.rowId = item.rowId || '';
     if (CHK.every(key => item[key] === 1)) tr.classList.add('done-row');
     if (selectedRowId && selectedRowId === (item.rowId || '')) tr.classList.add('row-selected');
-    tr.addEventListener('click', event => {
-      if (event.target.closest('td')) return;
-    });
+    bindRowTapSelection(tr);
 
     const tdNo = document.createElement('td');
     tdNo.className = 'td-no';
@@ -3247,12 +3649,6 @@ function render() {
   document.getElementById('s-total').textContent = visibleData.length;
 }
 
-document.addEventListener('pointermove', moveHeldColumn, { passive: false });
-document.addEventListener('pointerup', endColumnHold);
-document.addEventListener('pointercancel', endColumnHold);
-document.addEventListener('pointermove', moveHeldRow, { passive: false });
-document.addEventListener('pointerup', endRowHold);
-document.addEventListener('pointercancel', endRowHold);
 document.getElementById('import-data-input')?.addEventListener('change', event => {
   importLocalDataFromFile(event.target.files?.[0]);
 });
