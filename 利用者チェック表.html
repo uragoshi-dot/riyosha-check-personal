@@ -144,8 +144,11 @@ input, textarea, select, option {
   flex-direction: column;
   gap: 4px;
   max-height: 64vh;
-  overflow-y: auto;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
   padding-right: 1px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .reorder-item {
   display: block;
@@ -155,6 +158,8 @@ input, textarea, select, option {
   border-radius: 8px;
   background: #f9fef5;
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 .reorder-item.is-selected {
   background: #dcfce7;
@@ -174,13 +179,19 @@ input, textarea, select, option {
 .reorder-hint {
   font-size: 10px;
   color: #f8fff4;
-  line-height: 1.4;
-  margin-bottom: 6px;
+  line-height: 1.2;
+  margin-bottom: 3px;
+  min-height: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .editor-actions {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 3px;
+  width: 100%;
 }
 .editor-list {
   display: flex;
@@ -242,13 +253,13 @@ input, textarea, select, option {
   cursor: pointer;
 }
 .editor-action-btn {
-  flex: 1 1 0;
+  width: 100%;
   min-width: 0;
   height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: #65b842;
   color: white;
@@ -258,12 +269,12 @@ input, textarea, select, option {
   cursor: pointer;
   white-space: nowrap;
   padding: 0 8px;
+  box-sizing: border-box;
 }
 .editor-action-btn.subtle {
   background: #edf9e7;
   color: #2d7a1a;
   border: 1px solid #b3e89a;
-  flex: 1.25 1 0;
 }
 .editor-action-btn.danger {
   background: #fee2e2;
@@ -788,9 +799,11 @@ td.td-biko {
 .modal-bg.compact-picker { align-items: center; padding: 16px; }
 .modal-bg.compact-picker .modal {
   border-radius: 16px;
+  width: 260px;
   max-width: 260px;
   max-height: none;
   padding: 16px;
+  box-sizing: border-box;
 }
 .modal-bg.compact-picker .modal-pill { margin-bottom: 10px; }
 .modal-bg.compact-picker .modal-name { font-size: 15px; margin-bottom: 10px; }
@@ -1364,8 +1377,23 @@ const FAC_KEY = 'riyosha_facilities_v1';
 const ORDER_MODE_KEY = 'riyosha_order_mode_v1';
 const COLUMN_ORDER_KEY = 'riyosha_column_order_v1';
 const CUSTOM_COLUMNS_KEY = 'riyosha_custom_columns_v1';
+const COLUMN_LABELS_KEY = 'riyosha_column_labels_v1';
 const CHK = ['monita', 'sikien', 'drive', 'hand', 'fax'];
 const BASE_MOVABLE_COLUMN_KEYS = ['yuko', 'level', 'planL', 'planS', 'visit', 'monita', 'sikien', 'drive', 'hand', 'fax', 'meeting', 'seho'];
+const DEFAULT_COLUMN_LABELS = {
+  yuko: '有効期間',
+  level: '介護度',
+  planL: '長期',
+  planS: '短期',
+  visit: '訪問日',
+  monita: 'モニ記録',
+  sikien: '支援経過',
+  drive: '利用票ドライブ',
+  hand: '次月利用票',
+  fax: '次月提供票',
+  meeting: '担会日',
+  seho: '生保'
+};
 const nameCollator = new Intl.Collator('ja', { sensitivity: 'base', numeric: true });
 const NAME_YOMI = {};
 const EXPORT_SCHEMA_VERSION = 1;
@@ -1383,6 +1411,7 @@ let pendingVisitClick = null;
 let orderMode = 'name';
 let addClientDraft = null;
 let customColumns = [];
+let columnLabels = {};
 let columnOrder = [...BASE_MOVABLE_COLUMN_KEYS];
 let selectedColumnKey = '';
 let columnDragPointerId = null;
@@ -1441,6 +1470,28 @@ function loadCustomColumns() {
 
 function saveCustomColumns() {
   localStorage.setItem(CUSTOM_COLUMNS_KEY, JSON.stringify(customColumns));
+}
+
+function loadColumnLabels() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(COLUMN_LABELS_KEY) || '{}');
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    return Object.fromEntries(
+      Object.entries(parsed)
+        .map(([key, value]) => [String(key), String(value || '').trim()])
+        .filter(([key, value]) => key && value)
+    );
+  } catch {
+    return {};
+  }
+}
+
+function saveColumnLabels() {
+  localStorage.setItem(COLUMN_LABELS_KEY, JSON.stringify(columnLabels));
+}
+
+function getColumnLabel(key) {
+  return columnLabels[key] || getCustomColumn(key)?.label || DEFAULT_COLUMN_LABELS[key] || key;
 }
 
 function getAllMovableColumnKeys() {
@@ -1825,7 +1876,8 @@ function buildExportPayload() {
     data: loadAll(),
     facilities: loadFacilities(),
     orderMode: loadOrderMode(),
-    customColumns: loadCustomColumns()
+    customColumns: loadCustomColumns(),
+    columnLabels: loadColumnLabels()
   };
 }
 
@@ -1882,12 +1934,15 @@ function importLocalDataFromFile(file) {
       const facilities = parsed && typeof parsed === 'object' ? parsed.facilities : null;
       const importedOrderMode = parsed && typeof parsed === 'object' ? parsed.orderMode : null;
       const importedCustomColumns = parsed && typeof parsed === 'object' ? parsed.customColumns : null;
+      const importedColumnLabels = parsed && typeof parsed === 'object' ? parsed.columnLabels : null;
       if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('invalid');
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       localStorage.setItem(FAC_KEY, JSON.stringify(Array.isArray(facilities) ? facilities : []));
       localStorage.setItem(ORDER_MODE_KEY, importedOrderMode === 'custom' ? 'custom' : 'name');
       localStorage.setItem(CUSTOM_COLUMNS_KEY, JSON.stringify(Array.isArray(importedCustomColumns) ? importedCustomColumns : []));
+      localStorage.setItem(COLUMN_LABELS_KEY, JSON.stringify(importedColumnLabels && typeof importedColumnLabels === 'object' && !Array.isArray(importedColumnLabels) ? importedColumnLabels : {}));
       customColumns = loadCustomColumns();
+      columnLabels = loadColumnLabels();
       columnOrder = loadColumnOrder();
       orderMode = loadOrderMode();
       currentData = getMonthData(curYear, curMonth);
@@ -2522,7 +2577,9 @@ function saveVisitTextEditor() {
   render();
 }
 
-function openAddClient() {
+function openAddClient(fromRowEditor) {
+  returnToRowEditorAfterAdd = Boolean(fromRowEditor);
+  closeModal();
   addClientDraft = defaultAddClientDraft();
   renderAddClientModal();
 }
@@ -2550,6 +2607,12 @@ function addClient() {
   }));
   addClientDraft = null;
   saveMonthData(curYear, curMonth, currentData);
+  if (returnToRowEditorAfterAdd) {
+    returnToRowEditorAfterAdd = false;
+    render();
+    renderRowReorderModal();
+    return;
+  }
   closeModal();
   render();
 }
@@ -2893,18 +2956,18 @@ function openAddColumnModal() {
 
 function getBaseColumnEditorItems() {
   return [
-    { key: 'yuko', label: '有効期間', type: 'date', custom: false },
-    { key: 'level', label: '介護度', type: 'fixed', custom: false },
-    { key: 'planL', label: '長期', type: 'date', custom: false },
-    { key: 'planS', label: '短期', type: 'date', custom: false },
-    { key: 'visit', label: '訪問日', type: 'fixed', custom: false },
-    { key: 'monita', label: 'モニ記録', type: 'check', custom: false },
-    { key: 'sikien', label: '支援経過', type: 'check', custom: false },
-    { key: 'drive', label: '利用票ドライブ', type: 'check', custom: false },
-    { key: 'hand', label: '次月利用票', type: 'check', custom: false },
-    { key: 'fax', label: '次月提供票', type: 'check', custom: false },
-    { key: 'meeting', label: '担会日', type: 'fixed', custom: false },
-    { key: 'seho', label: '生保', type: 'fixed', custom: false }
+    { key: 'yuko', label: getColumnLabel('yuko'), type: 'date', custom: false },
+    { key: 'level', label: getColumnLabel('level'), type: 'fixed', custom: false },
+    { key: 'planL', label: getColumnLabel('planL'), type: 'date', custom: false },
+    { key: 'planS', label: getColumnLabel('planS'), type: 'date', custom: false },
+    { key: 'visit', label: getColumnLabel('visit'), type: 'fixed', custom: false },
+    { key: 'monita', label: getColumnLabel('monita'), type: 'check', custom: false },
+    { key: 'sikien', label: getColumnLabel('sikien'), type: 'check', custom: false },
+    { key: 'drive', label: getColumnLabel('drive'), type: 'check', custom: false },
+    { key: 'hand', label: getColumnLabel('hand'), type: 'check', custom: false },
+    { key: 'fax', label: getColumnLabel('fax'), type: 'check', custom: false },
+    { key: 'meeting', label: getColumnLabel('meeting'), type: 'fixed', custom: false },
+    { key: 'seho', label: getColumnLabel('seho'), type: 'fixed', custom: false }
   ];
 }
 
@@ -2925,24 +2988,31 @@ function getColumnEditorItems() {
 
 function openColumnEditorModal() {
   columnEditorReorderMode = false;
+  columnEditorTextMode = false;
   selectedColumnReorderKey = '';
   renderColumnEditorModal();
 }
 
 function renderColumnEditorModal() {
   const items = getColumnEditorItems();
+  const rowClick = item => {
+    if (columnEditorReorderMode) return `tapColumnReorder('${esc(item.key)}')`;
+    if (columnEditorTextMode) return `openColumnLabelEditor('${esc(item.key)}')`;
+    return `selectColumnEditorItem('${esc(item.key)}')`;
+  };
   showModal('項目編集', '',
     `<div class="editor-actions">
       <button class="editor-action-btn" onclick="openAddColumnModal()">追加</button>
       <button class="editor-action-btn subtle${columnEditorReorderMode ? ' is-active' : ''}" onclick="toggleColumnEditorReorderMode()">並び替え</button>
+      <button class="editor-action-btn subtle${columnEditorTextMode ? ' is-active' : ''}" onclick="toggleColumnEditorTextMode()">文字編集</button>
     </div>
-    <div class="reorder-hint">${columnEditorReorderMode ? (selectedColumnReorderKey ? '緑の項目を移動中です。入れたい位置の項目を押してください。' : '移動したい項目を押してください。') : '横列の項目一覧です。追加項目のみ削除できます。'}</div>
+    <div class="reorder-hint">${columnEditorTextMode ? '名前を変えたい項目を押してください。' : (columnEditorReorderMode ? (selectedColumnReorderKey ? '緑の項目を移動中です。入れたい位置の項目を押してください。' : '移動したい項目を押してください。') : '横列の項目一覧です。追加項目のみ削除できます。')}</div>
     <div class="editor-list">
       ${items.map(item => `
-        <div class="editor-row${(columnEditorReorderMode ? selectedColumnReorderKey === item.key : selectedColumnKey === item.key) ? ' is-selected' : ''}" onclick="${columnEditorReorderMode ? `tapColumnReorder('${esc(item.key)}')` : `selectColumnEditorItem('${esc(item.key)}')`}">
+        <div class="editor-row${(columnEditorReorderMode ? selectedColumnReorderKey === item.key : selectedColumnKey === item.key) ? ' is-selected' : ''}" onclick="${rowClick(item)}">
           <div class="editor-row-label">${esc(item.label)}</div>
           <div class="editor-row-actions">
-            ${columnEditorReorderMode
+            ${columnEditorReorderMode || columnEditorTextMode
               ? ``
               : `${item.custom ? `<button class="editor-chip" onclick="event.stopPropagation();confirmDeleteColumn('${esc(item.key)}')">削除</button>` : ''}`
             }
@@ -2961,7 +3031,49 @@ function selectColumnEditorItem(key) {
 
 function toggleColumnEditorReorderMode() {
   columnEditorReorderMode = !columnEditorReorderMode;
+  columnEditorTextMode = false;
   selectedColumnReorderKey = '';
+  renderColumnEditorModal();
+}
+
+function toggleColumnEditorTextMode() {
+  columnEditorTextMode = !columnEditorTextMode;
+  columnEditorReorderMode = false;
+  selectedColumnReorderKey = '';
+  renderColumnEditorModal();
+}
+
+function openColumnLabelEditor(key) {
+  const currentLabel = getColumnLabel(key);
+  showModal('項目名編集', currentLabel,
+    `<input class="modal-input" id="column-label-input" value="${esc(currentLabel)}" placeholder="項目名">
+     <button class="mact green" style="width:100%;margin-top:8px" onclick="saveColumnLabelEdit('${esc(key)}')">OK</button>`
+  );
+  document.getElementById('modal').classList.add('compact-picker');
+  setTimeout(() => {
+    const input = document.getElementById('column-label-input');
+    if (input) input.focus();
+  }, 100);
+}
+
+function saveColumnLabelEdit(key) {
+  const label = (document.getElementById('column-label-input')?.value || '').trim();
+  if (!label) {
+    alert('項目名を入力してください');
+    return;
+  }
+  const custom = getCustomColumn(key);
+  if (custom) {
+    customColumns = customColumns.map(item => item.key === key ? { ...item, label } : item);
+    saveCustomColumns();
+  } else {
+    const defaultLabel = DEFAULT_COLUMN_LABELS[key] || '';
+    columnLabels = { ...columnLabels };
+    if (label === defaultLabel) delete columnLabels[key];
+    else columnLabels[key] = label;
+    saveColumnLabels();
+  }
+  render();
   renderColumnEditorModal();
 }
 
@@ -3056,8 +3168,10 @@ function updateManualOrderFromVisibleRows(visibleRows) {
 let selectedRowReorderId = '';
 let selectedColumnReorderKey = '';
 let columnEditorReorderMode = false;
+let columnEditorTextMode = false;
 let rowEditorReorderMode = false;
 let rowEditorDeleteMode = false;
+let returnToRowEditorAfterAdd = false;
 
 function openRowReorderModal() {
   if (loadOrderMode() !== 'custom') {
@@ -3073,13 +3187,12 @@ function openRowReorderModal() {
 
 function renderRowReorderModal() {
   const rows = getVisibleRowItems();
-  showModal('行並び替え', '',
+  showModal('利用者編集', '',
     `<div class="editor-actions">
-      <button class="editor-action-btn" onclick="openAddClient()">追加</button>
+      <button class="editor-action-btn" onclick="openAddClient(true)">追加</button>
       <button class="editor-action-btn subtle${rowEditorReorderMode ? ' is-active' : ''}" onclick="toggleRowEditorReorderMode()">並び替え</button>
       <button class="editor-action-btn danger${rowEditorDeleteMode ? ' is-active' : ''}" onclick="toggleRowEditorDeleteMode()">削除</button>
     </div>
-    <div class="reorder-hint">${rowEditorDeleteMode ? '削除したい利用者名を押してください。' : (rowEditorReorderMode ? (selectedRowReorderId ? '緑の利用者を移動中です。入れたい位置の利用者名を押してください。' : '移動したい利用者名を押してください。') : '利用者一覧です。')}</div>
     <div class="reorder-list">
       ${rows.map(item => {
         const isSelected = item.rowId === selectedRowReorderId;
@@ -3141,25 +3254,12 @@ function tapRowReorder(rowId) {
 }
 
 function getColumnLabelForReorder(key) {
-  const labels = {
-    yuko: '有効期間',
-    level: '介護度',
-    planL: '長期',
-    planS: '短期',
-    visit: '訪問日',
-    monita: 'モニ記録',
-    sikien: '支援経過',
-    drive: '利用票ドライブ',
-    hand: '次月利用票',
-    fax: '次月提供票',
-    meeting: '担会日',
-    seho: '生保'
-  };
-  return labels[key] || getCustomColumn(key)?.label || key;
+  return getColumnLabel(key);
 }
 
 function openColumnReorderModal(fromEditor) {
   columnEditorReorderMode = true;
+  columnEditorTextMode = false;
   selectedColumnReorderKey = '';
   renderColumnEditorModal();
 }
@@ -3264,6 +3364,11 @@ function renderColumnHeaderOrder() {
   const headerRow = document.querySelector('thead tr');
   if (!headerRow) return;
   Array.from(headerRow.querySelectorAll('th[data-custom-col="1"]')).forEach(th => th.remove());
+  Array.from(headerRow.querySelectorAll('th[data-col-key]')).forEach(th => {
+    const key = th.dataset.colKey || '';
+    const label = getColumnLabel(key);
+    th.innerHTML = `<span class="inner">${esc(label)}</span>`;
+  });
   const fixedStart = Array.from(headerRow.querySelectorAll('th')).slice(0, 3);
   const fixedEnd = headerRow.querySelector('th.h-biko');
   customColumns.forEach(item => {
@@ -3271,7 +3376,7 @@ function renderColumnHeaderOrder() {
     th.className = `h-rot${item.type === 'date' ? ' h-rot-date' : ''} col-movable`;
     th.dataset.colKey = item.key;
     th.dataset.customCol = '1';
-    th.innerHTML = `<span class="inner">${esc(item.label)}</span>`;
+    th.innerHTML = `<span class="inner">${esc(getColumnLabel(item.key))}</span>`;
     headerRow.insertBefore(th, fixedEnd);
   });
   const movableMap = new Map(
@@ -3661,6 +3766,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 
 removeUnusedTaskHeaders();
 customColumns = loadCustomColumns();
+columnLabels = loadColumnLabels();
 columnOrder = loadColumnOrder();
 bindMovableColumnHeaders();
 render();
