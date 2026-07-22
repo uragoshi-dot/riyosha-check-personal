@@ -2203,11 +2203,10 @@ function shortDate(value) {
   return `${year}/${month}/${day}`;
 }
 
-function getYukoStatus(value) {
+function getYukoStatus(value, displayYear = curYear, displayMonth = curMonth) {
   const parsed = parseAnyDate(value);
   if (!parsed) return '';
-  const today = new Date();
-  const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const currentMonthStart = new Date(displayYear, displayMonth - 1, 1);
   const redStart = new Date(parsed.year, parsed.month - 3, 1);
   const grayStart = new Date(parsed.year, parsed.month - 2, 1);
   const nextCertStart = new Date(parsed.year, parsed.month, 1);
@@ -2229,24 +2228,24 @@ function isNewCertificationStarted(value) {
   return getYukoStatus(value) === 'blank';
 }
 
-function isCurrentShortPlan(value) {
+function isCurrentShortPlan(value, displayYear = curYear, displayMonth = curMonth) {
   if (!value) return false;
   const match = value.match(/R(\d+)\.(\d+)\.(\d+)/);
   if (!match) return false;
   const y = parseInt(match[1], 10) + 2018;
   const m = parseInt(match[2], 10);
   const start = new Date(y, m - 1, 1);
-  return new Date() >= start;
+  return new Date(displayYear, displayMonth - 1, 1) >= start;
 }
 
-function isCurrentLongPlan(value) {
+function isCurrentLongPlan(value, displayYear = curYear, displayMonth = curMonth) {
   if (!value) return false;
   const match = value.match(/R(\d+)\.(\d+)\.(\d+)/);
   if (!match) return false;
   const y = parseInt(match[1], 10) + 2018;
   const m = parseInt(match[2], 10);
   const start = new Date(y, m - 1, 1);
-  return new Date() >= start;
+  return new Date(displayYear, displayMonth - 1, 1) >= start;
 }
 
 function parseWareki(value) {
