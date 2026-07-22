@@ -1969,7 +1969,6 @@ function syncClientList(data) {
 function resetMonthlyWorkFields(item) {
   const next = {
     ...item,
-    kosin: '',
     visit: '',
     visitDate: '',
     visitTag1: '',
@@ -2020,6 +2019,7 @@ function syncBasicFieldsFromPreviousMonth(currentList, previousList) {
       noNumber: Boolean(prev.noNumber),
       deleted: Boolean(prev.deleted),
       kana: prev.kana || '',
+      kosin: prev.kosin || '',
       yuko: prev.yuko || '',
       level: prev.level || '',
       planL: prev.planL || '',
