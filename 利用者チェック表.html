@@ -452,7 +452,7 @@ thead th {
   z-index: 10;
 }
 th.h-no {
-  width: 30px;
+  width: 32px;
   font-size: 10px;
   color: #2d7a1a;
   font-weight: 700;
@@ -469,10 +469,10 @@ th.h-name {
   vertical-align: middle;
   padding: 0;
 }
-th.h-kosin { width: 40px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; border-right: 2px solid #86d46a; vertical-align: middle; padding-top: 0; padding-bottom: 0; }
+th.h-kosin { width: 44px; font-size: 8px; color: #2d7a1a; font-weight: 700; text-align: center; border-right: 2px solid #86d46a; vertical-align: middle; padding-top: 0; padding-bottom: 0; }
 th.h-rot { width: 28px; }
-th[data-col-key="level"] { width: 28px; vertical-align: middle; padding: 0; }
-th.h-rot-date { width: 56px; vertical-align: middle; padding: 0; }
+th[data-col-key="level"] { width: 32px; vertical-align: middle; padding: 0; }
+th.h-rot-date { width: 60px; vertical-align: middle; padding: 0; }
 th.h-visit { width: 44px; }
 th.h-seho { width: 44px; }
 th[data-col-key="monita"],
@@ -527,6 +527,7 @@ th .inner.split {
   font-size: 6.8px;
   line-height: 1.05;
   letter-spacing: 0;
+  transform: translateY(1px);
 }
 th .inner.split span {
   display: block;
@@ -577,8 +578,8 @@ td {
   font-size: 12px;
   color: #92400e;
 }
-td.td-no { font-size: 10px; color: #86d46a; font-weight: 700; width: 30px; text-align: center; vertical-align: middle; padding: 0; -webkit-user-select: none; user-select: none; }
-td.td-lv { min-width: 28px; }
+td.td-no { font-size: 10px; color: #86d46a; font-weight: 700; width: 32px; text-align: center; vertical-align: middle; padding: 0; -webkit-user-select: none; user-select: none; }
+td.td-lv { min-width: 32px; }
 td.td-name {
   text-align: center;
   padding: 0;
@@ -620,7 +621,7 @@ td.td-name {
   text-overflow: ellipsis;
 }
 td.td-kosin {
-  width: 40px;
+  width: 44px;
   padding: 0 2px;
   font-size: 9px;
   font-weight: 700;
@@ -630,12 +631,12 @@ td.td-kosin {
   line-height: 1.25;
   border-right: 2px solid #b3e89a;
 }
-td.td-date { font-size: 9px; font-weight: 600; color: #1a4d0e; padding: 0 1px; width: 56px; white-space: nowrap; }
+td.td-date { font-size: 9px; font-weight: 600; color: #1a4d0e; padding: 0 1px; width: 60px; white-space: nowrap; }
 td.td-date.expiring { color: #dc2626; font-weight: 700; }
 td.td-date.expiring-done { color: #b8c0b3; font-weight: 600; }
 td.td-date.plan-long-current { color: #dc2626; font-weight: 700; }
 td.td-date.plan-current { color: #dc2626; font-weight: 700; }
-td.td-lv { font-size: 11px; font-weight: 700; color: #2d7a1a; width: 28px; }
+td.td-lv { font-size: 11px; font-weight: 700; color: #2d7a1a; width: 32px; white-space: nowrap; }
 td.td-lv.is-clickable { cursor: pointer; }
 td.td-visit {
   width: 58px;
@@ -1058,11 +1059,11 @@ td.td-biko {
 }
 @media (max-width: 1024px) {
   table { min-width: 800px; }
-  th.h-no { width: 28px; }
+  th.h-no { width: 30px; }
   th.h-name { width: 72px; padding-left: 0; }
-  th.h-kosin { width: 36px; }
+  th.h-kosin { width: 40px; }
   th.h-rot { width: 26px; }
-  th.h-rot-date { width: 52px; }
+  th.h-rot-date { width: 56px; }
   th.h-visit { width: 42px; }
   th.h-seho { width: 42px; }
   th[data-col-key="monita"],
@@ -1071,13 +1072,13 @@ td.td-biko {
   th[data-col-key="hand"],
   th[data-col-key="fax"],
   th[data-col-key="meeting"] { width: 42px; }
-  th[data-col-key="level"] { width: 26px; }
+  th[data-col-key="level"] { width: 30px; }
   th.h-biko { min-width: 150px; width: 150px; padding-left: 0; }
-  td.td-no { width: 28px; }
+  td.td-no { width: 30px; }
   td.td-name { width: 72px; padding: 0; }
-  td.td-kosin { width: 36px; font-size: 8px; }
-  td.td-date { width: 52px; }
-  td.td-lv { min-width: 26px; }
+  td.td-kosin { width: 40px; font-size: 8px; }
+  td.td-date { width: 56px; }
+  td.td-lv { min-width: 30px; width: 30px; }
   td.td-visit { width: 56px; }
   td.td-cc { width: 56px; }
   td.td-seho { width: 56px; }
@@ -3364,14 +3365,27 @@ function closeConfirm() {
   document.getElementById('confirm').classList.remove('show');
 }
 
+function getColumnHeaderInnerHtml(key) {
+  const label = getColumnLabel(key);
+  if (key === 'drive' && label === DEFAULT_COLUMN_LABELS.drive) {
+    return '<span class="inner split"><span>利用票</span><span class="sub-label">ドライブ</span></span>';
+  }
+  if (key === 'hand' && label === DEFAULT_COLUMN_LABELS.hand) {
+    return '<span class="inner split"><span>次月</span><span>利用票</span></span>';
+  }
+  if (key === 'fax' && label === DEFAULT_COLUMN_LABELS.fax) {
+    return '<span class="inner split"><span>次月</span><span>提供票</span></span>';
+  }
+  return `<span class="inner">${esc(label)}</span>`;
+}
+
 function renderColumnHeaderOrder() {
   const headerRow = document.querySelector('thead tr');
   if (!headerRow) return;
   Array.from(headerRow.querySelectorAll('th[data-custom-col="1"]')).forEach(th => th.remove());
   Array.from(headerRow.querySelectorAll('th[data-col-key]')).forEach(th => {
     const key = th.dataset.colKey || '';
-    const label = getColumnLabel(key);
-    th.innerHTML = `<span class="inner">${esc(label)}</span>`;
+    th.innerHTML = getColumnHeaderInnerHtml(key);
   });
   const fixedStart = Array.from(headerRow.querySelectorAll('th')).slice(0, 3);
   const fixedEnd = headerRow.querySelector('th.h-biko');
@@ -3380,7 +3394,7 @@ function renderColumnHeaderOrder() {
     th.className = `h-rot${item.type === 'date' ? ' h-rot-date' : ''} col-movable`;
     th.dataset.colKey = item.key;
     th.dataset.customCol = '1';
-    th.innerHTML = `<span class="inner">${esc(getColumnLabel(item.key))}</span>`;
+    th.innerHTML = getColumnHeaderInnerHtml(item.key);
     headerRow.insertBefore(th, fixedEnd);
   });
   const movableMap = new Map(
