@@ -1966,15 +1966,83 @@ function syncClientList(data) {
   return dedupeClients(merged);
 }
 
+function resetMonthlyWorkFields(item) {
+  const next = {
+    ...item,
+    kosin: '',
+    visit: '',
+    visitDate: '',
+    visitTag1: '',
+    visitTag2: '',
+    meetingDate: '',
+    meetingTag1: '',
+    meetingTag2: '',
+    monita: 0,
+    sikien: 0,
+    drive: 0,
+    hand: 0,
+    fax: 0,
+    faxOffices: normalizeFaxOffices(item.faxOffices).map(office => ({ ...office, checked: false })),
+    plan: 0,
+    meeting: 0,
+    shokai: 0,
+    assess: 0
+  };
+  return next;
+}
+
+function clientMatchKeys(item) {
+  const keys = [item?.rowId, item?.baseName, item?.name]
+    .map(value => String(value || '').trim())
+    .filter(Boolean);
+  return [...new Set(keys)];
+}
+
+function syncBasicFieldsFromPreviousMonth(currentList, previousList) {
+  if (!Array.isArray(previousList) || previousList.length === 0) return currentList;
+  const previousNormalized = dedupeClients(previousList);
+  const currentNormalized = dedupeClients(currentList);
+  const currentByKey = new Map();
+  currentNormalized.forEach(item => {
+    clientMatchKeys(item).forEach(key => currentByKey.set(key, item));
+  });
+  const used = new Set();
+  const merged = previousNormalized.map(prev => {
+    const current = clientMatchKeys(prev).map(key => currentByKey.get(key)).find(Boolean);
+    if (current) used.add(current);
+    const source = current || resetMonthlyWorkFields(prev);
+    return {
+      ...source,
+      rowId: prev.rowId || source.rowId,
+      name: prev.name || '',
+      baseName: prev.baseName !== undefined ? prev.baseName : (prev.name || ''),
+      customAdded: Boolean(prev.customAdded),
+      noNumber: Boolean(prev.noNumber),
+      deleted: Boolean(prev.deleted),
+      kana: prev.kana || '',
+      yuko: prev.yuko || '',
+      level: prev.level || '',
+      planL: prev.planL || '',
+      planS: prev.planS || '',
+      seho: prev.seho || '',
+      sehoCw: prev.sehoCw || '',
+      biko: prev.biko || '',
+      faxOffices: normalizeFaxOffices(prev.faxOffices).map((office, index) => {
+        const currentOffice = normalizeFaxOffices(source.faxOffices)[index];
+        return { ...office, checked: Boolean(currentOffice?.checked) };
+      }),
+      customFields: normalizeCustomFieldValues(prev.customFields)
+    };
+  });
+  currentNormalized.forEach(item => {
+    if (!used.has(item)) merged.push(item);
+  });
+  return dedupeClients(merged);
+}
+
 function getMonthData(y, m) {
   const all = loadAll();
   const key = monthKey(y, m);
-  if (all[key]) {
-    all[key] = sortClientsByName(syncClientList(all[key]));
-    saveAll(all);
-    return all[key];
-  }
-
   let pm = m - 1;
   let py = y;
   if (pm < 1) {
@@ -1983,28 +2051,17 @@ function getMonthData(y, m) {
   }
   const prevKey = monthKey(py, pm);
 
+  if (all[key]) {
+    const synced = all[prevKey] && all[prevKey].length > 0
+      ? syncBasicFieldsFromPreviousMonth(all[key], all[prevKey])
+      : all[key];
+    all[key] = sortClientsByName(syncClientList(synced));
+    saveAll(all);
+    return all[key];
+  }
+
   if (all[prevKey] && all[prevKey].length > 0) {
-    all[key] = all[prevKey].map(c => ({
-      ...c,
-      kosin: '',
-      visit: '',
-      visitDate: '',
-      visitTag1: '',
-      visitTag2: '',
-      meetingDate: '',
-      meetingTag1: '',
-      meetingTag2: '',
-      monita: 0,
-      sikien: 0,
-      drive: 0,
-      hand: 0,
-      fax: 0,
-      faxOffices: normalizeFaxOffices(c.faxOffices).map(office => ({ ...office, checked: false })),
-      plan: 0,
-      meeting: 0,
-      shokai: 0,
-      assess: 0
-    }));
+    all[key] = all[prevKey].map(resetMonthlyWorkFields);
   } else {
     all[key] = DEFAULT_CLIENTS.map(newClientData);
   }
